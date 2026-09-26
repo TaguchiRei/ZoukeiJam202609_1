@@ -4,11 +4,13 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UsefulToolkit.BlackBoard.Input;
 using UsefulToolkit.Initialization;
+using ZoukeiJam1.BlackBoard.OmikujiEngine;
 
 namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
 {
     /// <summary>
     /// ピストンのドラッグ入力からクランク角を更新し、クランク・ピストン・コンロッドの Transform に反映する。
+    /// 毎フレーム、クランクの動きを <see cref="CrankUpdatedHandler"/> で渡す。
     /// 回転は正転のみ。行程の途中で逆方向へドラッグすると直前に通過した死点まで戻り、そこで止まる
     /// </summary>
     public sealed class OmikujiEngineManager : InitializableMonoBehaviour
@@ -40,9 +42,9 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         [SerializeField, Min(0f)] private float _topDeadCenterImpulseRearmDistance = 0.1f;
 
         private IInputState _input;
+        private OmikujiEngineRig _rig;
         private OmikujiEngineGeometry _geometry;
         private float _initialAngle;
-        private Vector2 _initialRodDirection;
 
         /// <summary>正転方向に積算したクランク角（rad）</summary>
         private float _angle;
@@ -56,29 +58,37 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         private bool _topDeadCenterImpulseArmed;
         private float _grabOffset;
 
-        /// <summary>初期状態から正転した回数</summary>
-        public int RevolutionCount => Mathf.FloorToInt((_angle - _initialAngle) / TwoPi);
+        private CrankUpdatedHandler _onCrankUpdated;
+
+        /// <summary>現在のピストンの行程</summary>
+        public PistonStroke Stroke => StrokeAt(_angle);
+
+        /// <summary>正転方向に積算したクランク角（rad）</summary>
+        public float CrankAngle => _angle;
 
         /// <summary>
         /// シーン上の配置から寸法を読み取り、入力の読み取りを開始する。
         /// 寸法は Crank・CrankPin・Piston がエンジンのローカル座標で初期配置にある前提で求める
         /// </summary>
+        /// <param name="input">ドラッグ入力の読み取り元</param>
         public void Initialize(IInputState input)
         {
             _input = input;
 
-            Vector2 crankCenter = _crank.localPosition;
-            Vector2 crankPin = crankCenter + (Vector2)(_crank.localRotation * _crankPin.localPosition);
-            Vector2 pistonPin = _piston.localPosition;
-
-            _geometry = new OmikujiEngineGeometry(crankCenter, crankPin, pistonPin, _clockwise);
-            _initialAngle = _geometry.AngleOf(crankPin);
-            _initialRodDirection = crankPin - pistonPin;
+            _rig = new OmikujiEngineRig(_crank, _crankPin, _piston, _arm, _clockwise);
+            _geometry = _rig.Geometry;
+            _initialAngle = _rig.InitialAngle;
             _angle = _initialAngle;
             _reverseLimitAngle = PreviousDeadCenterAngle(_angle);
             _topDeadCenterImpulseArmed = !IsAtTopDeadCenter();
 
             base.Initialize();
+        }
+
+        /// <summary>毎フレームのクランクの動きを渡すコールバックを設定する</summary>
+        public void SetCrankUpdatedHandler(CrankUpdatedHandler onCrankUpdated)
+        {
+            _onCrankUpdated = onCrankUpdated;
         }
 
         private void Update()
@@ -90,7 +100,10 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             if (!pressed) _isDragging = false;
             _wasPressed = pressed;
 
+            float previousAngle = _angle;
             if (_isDragging) MovePistonTo(TargetHeightFrom(pointer.y));
+
+            _onCrankUpdated?.Invoke(_angle, _angle - previousAngle, RevolutionCount(), Stroke, Time.deltaTime);
         }
 
         /// <summary>
@@ -153,8 +166,34 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             _angle = Mathf.Max(_angle + delta, _reverseLimitAngle);
             _reverseLimitAngle = Mathf.Max(_reverseLimitAngle, PreviousDeadCenterAngle(_angle));
 
-            ApplyPose();
+            _rig.ApplyPose(_angle);
             NotifyTopDeadCenterArrival();
+        }
+
+        /// <summary>初期状態から正転で上死点を通過した回数</summary>
+        private int RevolutionCount()
+        {
+            return TopDeadCenterPassCount(_angle) - TopDeadCenterPassCount(_initialAngle);
+        }
+
+        /// <summary>
+        /// 基準の上死点から指定角までに通過した上死点の数。
+        /// 逆回転は直前の死点で止まるため、この値が減ることはない
+        /// </summary>
+        private int TopDeadCenterPassCount(float angle)
+        {
+            // 上死点ちょうどの角度が浮動小数の誤差で通過前と判定されないよう、わずかに進めて求める
+            float probe = angle + DeadCenterAngleTolerance;
+            return Mathf.FloorToInt((probe - _geometry.TopDeadCenterAngle) / TwoPi);
+        }
+
+        /// <summary>指定角でのピストンの行程。直前に通過した死点が上死点なら Down、下死点なら Up</summary>
+        private PistonStroke StrokeAt(float angle)
+        {
+            float probe = angle + DeadCenterAngleTolerance;
+            float sinceTop = Mathf.Repeat(probe - _geometry.TopDeadCenterAngle, TwoPi);
+            float sinceBottom = Mathf.Repeat(probe - _geometry.BottomDeadCenterAngle, TwoPi);
+            return sinceTop < sinceBottom ? PistonStroke.Down : PistonStroke.Up;
         }
 
         /// <summary>
@@ -198,18 +237,6 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             float top = probe - Mathf.Repeat(probe - _geometry.TopDeadCenterAngle, TwoPi);
             float bottom = probe - Mathf.Repeat(probe - _geometry.BottomDeadCenterAngle, TwoPi);
             return Mathf.Max(top, bottom);
-        }
-
-        /// <summary>現在のクランク角をクランク・ピストン・コンロッドの Transform に反映する</summary>
-        private void ApplyPose()
-        {
-            Vector2 crankPin = _geometry.CrankPinAt(_angle);
-            Vector2 pistonPin = _geometry.PistonPinAt(_angle);
-
-            float crankDegrees = -(_clockwise ? 1f : -1f) * (_angle - _initialAngle) * Mathf.Rad2Deg;
-            _crank.localRotation = Quaternion.Euler(0f, 0f, crankDegrees);
-            _piston.localPosition = new Vector3(pistonPin.x, pistonPin.y, _piston.localPosition.z);
-            _arm.localRotation = Quaternion.Euler(0f, 0f, Vector2.SignedAngle(_initialRodDirection, crankPin - pistonPin));
         }
 
         /// <summary>角度を (-π, π] に収める</summary>
