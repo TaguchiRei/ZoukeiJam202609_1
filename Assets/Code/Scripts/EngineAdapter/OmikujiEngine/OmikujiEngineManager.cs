@@ -36,6 +36,9 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         [Tooltip("ピストンが上死点に到達したときに発生させる画面振動")]
         [SerializeField] private CinemachineImpulseSource _topDeadCenterImpulse;
 
+        [Tooltip("画面振動の後、ピストンが上死点からこの距離（エンジンのローカル座標）以上離れるまで次の振動を発生させない")]
+        [SerializeField, Min(0f)] private float _topDeadCenterImpulseRearmDistance = 0.1f;
+
         private IInputState _input;
         private OmikujiEngineGeometry _geometry;
         private float _initialAngle;
@@ -49,7 +52,8 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
 
         private bool _isDragging;
         private bool _wasPressed;
-        private bool _wasAtTopDeadCenter;
+        /// <summary>次に上死点へ触れたときに画面振動を発生させてよいか</summary>
+        private bool _topDeadCenterImpulseArmed;
         private float _grabOffset;
 
         /// <summary>初期状態から正転した回数</summary>
@@ -72,7 +76,7 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             _initialRodDirection = crankPin - pistonPin;
             _angle = _initialAngle;
             _reverseLimitAngle = PreviousDeadCenterAngle(_angle);
-            _wasAtTopDeadCenter = IsAtTopDeadCenter();
+            _topDeadCenterImpulseArmed = !IsAtTopDeadCenter();
 
             base.Initialize();
         }
@@ -153,16 +157,22 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             NotifyTopDeadCenterArrival();
         }
 
-        /// <summary>上死点に到達したフレームでだけ画面振動を発生させる</summary>
+        /// <summary>
+        /// 上死点に触れた瞬間に 1 度だけ画面振動を発生させる。
+        /// 上死点付近での細かな上下や死点への吸い付きで繰り返し振動しないよう、
+        /// 上死点から _topDeadCenterImpulseRearmDistance 以上離れるまで次の振動を発生させない
+        /// </summary>
         private void NotifyTopDeadCenterArrival()
         {
-            bool isAtTopDeadCenter = IsAtTopDeadCenter();
-            if (isAtTopDeadCenter && !_wasAtTopDeadCenter && _topDeadCenterImpulse != null)
+            if (_topDeadCenterImpulseArmed && IsAtTopDeadCenter())
             {
-                _topDeadCenterImpulse.GenerateImpulse();
+                _topDeadCenterImpulseArmed = false;
+                if (_topDeadCenterImpulse != null) _topDeadCenterImpulse.GenerateImpulse();
+                return;
             }
 
-            _wasAtTopDeadCenter = isAtTopDeadCenter;
+            float distanceFromTop = _geometry.TopDeadCenterHeight - _geometry.PistonPinAt(_angle).y;
+            if (distanceFromTop >= _topDeadCenterImpulseRearmDistance) _topDeadCenterImpulseArmed = true;
         }
 
         private bool IsAtDeadCenter()
