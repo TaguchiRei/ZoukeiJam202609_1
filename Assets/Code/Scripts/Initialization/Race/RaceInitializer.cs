@@ -17,7 +17,8 @@ namespace ZoukeiJam1.Initialization.Race
     /// <summary>
     /// BlackBoard から OmikujiEngine の State と RaceBoard を取り出して RaceService と GoalService を生成し、
     /// RaceTicker から毎フレーム RaceService を更新させ、開始演出の終了で走行を始めるようにつなぐ。
-    /// HUD とゲームオーバーの表示には RaceService が登録した State を渡し、ゲームオーバーのボタンにタイトル・インゲームへの遷移をつなぐ
+    /// HUD・ゲームオーバーの表示・ゴールの演出には RaceService が登録した State を渡し、
+    /// ゲームオーバーのボタンにタイトル・インゲームへの遷移を、ゴールの演出の終了にリザルトへの遷移をつなぐ
     /// </summary>
     [InitializeOrder(InitializeOrderConst.Default)]
     public sealed class RaceInitializer : InitializerBase, IInjectable<IGameResultRecorder, IGameSceneTransition>
@@ -29,6 +30,7 @@ namespace ZoukeiJam1.Initialization.Race
         [SerializeField] private StartCountdown _startCountdown;
         [SerializeField] private RaceHud _hud;
         [SerializeField] private GameOverView _gameOverView;
+        [SerializeField] private GoalPresenter _goalPresenter;
 
         private IGameResultRecorder _resultRecorder;
         private IGameSceneTransition _sceneTransition;
@@ -63,9 +65,10 @@ namespace ZoukeiJam1.Initialization.Race
             if (raceBoard.TryGetSceneState<IRaceState>(out var raceState, out _))
             {
                 _goalService = new GoalService(
-                    raceState, _resultSettings.CreateGoalResultCalculator(), _resultRecorder, _sceneTransition);
+                    raceState, _resultSettings.CreateGoalResultCalculator(), _resultRecorder);
                 _hud.Initialize(raceState);
                 _gameOverView.Initialize(raceState, _sceneTransition.ToTitle, _sceneTransition.ToRace);
+                _goalPresenter.Initialize(raceState, _sceneTransition.ToResult);
             }
 
             _ticker.Initialize(service.Update);

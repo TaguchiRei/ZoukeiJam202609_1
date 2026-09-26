@@ -1,31 +1,25 @@
 using UsefulToolkit.BlackBoard.BlackBoard;
-using ZoukeiJam1.Application.SceneTransition;
 using ZoukeiJam1.BlackBoard.Race;
 
 namespace ZoukeiJam1.Application.Race
 {
     /// <summary>
-    /// 走行の進行段階がゴールになったら、ゴールタイム・制限時間・ゴール時の速度から結果を求めて記録し、リザルトシーンへ遷移する
+    /// 走行の進行段階がゴールになったら、ゴールタイム・制限時間・ゴール時の速度から結果を求めて記録する
     /// </summary>
     public sealed class GoalService
     {
         private readonly IRaceState _raceState;
         private readonly GoalResultCalculator _calculator;
         private readonly IGameResultRecorder _recorder;
-        private readonly IGameSceneTransition _sceneTransition;
 
         /// <param name="raceState">ゴールの検知と、ゴールタイム・制限時間・ゴール時の速度の読み取り元</param>
         /// <param name="calculator">ゴール時の結果の計算</param>
         /// <param name="recorder">結果の記録先</param>
-        /// <param name="sceneTransition">リザルトシーンへの遷移の要求先</param>
-        public GoalService(
-            IRaceState raceState, GoalResultCalculator calculator, IGameResultRecorder recorder,
-            IGameSceneTransition sceneTransition)
+        public GoalService(IRaceState raceState, GoalResultCalculator calculator, IGameResultRecorder recorder)
         {
             _raceState = raceState;
             _calculator = calculator;
             _recorder = recorder;
-            _sceneTransition = sceneTransition;
 
             _raceState.RegisterEventOnPhaseChanged(
                 new ActionEntry<StateContext<RacePhase>>(false, OnPhaseChanged));
@@ -38,7 +32,6 @@ namespace ZoukeiJam1.Application.Race
             var result = _calculator.Calculate(
                 _raceState.GoalDistance, _raceState.ElapsedTime, _raceState.TimeLimit, _raceState.Speed);
             _recorder.Record(result);
-            _sceneTransition.ToResult();
         }
     }
 }

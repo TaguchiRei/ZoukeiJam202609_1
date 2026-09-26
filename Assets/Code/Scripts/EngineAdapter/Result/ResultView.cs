@@ -1,17 +1,24 @@
 using System;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using ZoukeiJam1.BlackBoard.Race;
+using ZoukeiJam1.EngineAdapter.Fade;
 
 namespace ZoukeiJam1.EngineAdapter.Result
 {
     /// <summary>
-    /// ゴールしたときの結果を Text に表示し、「タイトルに戻る」ともう一度走るボタンを出す（仮のリザルト表示）。
+    /// 暗転した状態から明転し、ゴールしたときの結果を Text に表示して、「タイトルに戻る」ともう一度走るボタンを出す（仮のリザルト表示）。
     /// もう一度走るボタンの文字は告白の成否で変える。どちらかのボタンを押したら、両方のボタンを押せなくする
     /// </summary>
     public sealed class ResultView : MonoBehaviour
     {
+        [SerializeField] private ScreenFader _fader;
+
+        [Tooltip("明転にかける時間（秒）")]
+        [SerializeField, Min(0f)] private float _fadeInSeconds = 0.6f;
+
         [Tooltip("おみくじの結果を表示する Text")]
         [SerializeField] private TMP_Text _fortuneText;
 
@@ -41,6 +48,9 @@ namespace ZoukeiJam1.EngineAdapter.Result
         /// <param name="onRetry">もう一度走るボタンを押したときの処理</param>
         public void Initialize(IGameResultState resultState, Action onBackToTitle, Action onRetry)
         {
+            _fader.SetAlpha(1f);
+            _fader.FadeAsync(0f, _fadeInSeconds, destroyCancellationToken).Forget();
+
             var result = resultState.Result;
 
             _fortuneText.text =

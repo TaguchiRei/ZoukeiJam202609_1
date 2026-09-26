@@ -9,7 +9,10 @@
         "UsefulToolkit.Input.BlackBoard.Runtime",
         "Unity.Cinemachine",
         "UnityEngine.UI",
-        "Unity.TextMeshPro"
+        "Unity.TextMeshPro",
+        "LitMotion",
+        "LitMotion.Extensions",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
