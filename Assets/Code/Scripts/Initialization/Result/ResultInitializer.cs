@@ -9,12 +9,12 @@ using ZoukeiJam1.EngineAdapter.Result;
 namespace ZoukeiJam1.Initialization.Result
 {
     /// <summary>
-    /// BlackBoard からゴールしたときの結果の State を取り出して ResultView に渡し、
+    /// BlackBoard からゴールしたときの結果の State を取り出して ResultSequence に渡して演出を始め、
     /// ボタンにタイトル・インゲームへの遷移をつなぐ
     /// </summary>
     public sealed class ResultInitializer : InitializerBase, IInjectable<IGameSceneTransition>
     {
-        [SerializeField] private ResultView _resultView;
+        [SerializeField] private ResultSequence _resultSequence;
 
         private IGameSceneTransition _sceneTransition;
 
@@ -33,7 +33,7 @@ namespace ZoukeiJam1.Initialization.Result
                 return;
             }
 
-            _resultView.Initialize(resultState, _sceneTransition.ToTitle, _sceneTransition.ToRace);
+            _resultSequence.Play(resultState.Result, _sceneTransition.ToTitle, _sceneTransition.ToRace);
             base.Initialize(blackBoard);
         }
     }
