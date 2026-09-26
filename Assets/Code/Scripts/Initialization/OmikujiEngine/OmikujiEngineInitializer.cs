@@ -1,8 +1,10 @@
 using UnityEngine;
+using UsefulToolkit.Attributes;
 using UsefulToolkit.BlackBoard.BlackBoard;
 using UsefulToolkit.BlackBoard.Input;
 using UsefulToolkit.BlackBoard.Logger;
 using UsefulToolkit.Initialization;
+using UsefulToolkit.Utility;
 using ZoukeiJam1.Application.OmikujiEngine;
 using ZoukeiJam1.BlackBoard.OmikujiEngine;
 using ZoukeiJam1.EngineAdapter.OmikujiEngine;
@@ -13,6 +15,7 @@ namespace ZoukeiJam1.Initialization.OmikujiEngine
     /// BlackBoard から入力 State と OmikujiEngineBoard を取り出し、OmikujiEngineManager と KujibikeService を生成・初期化して、
     /// Manager の毎フレームのクランクの動きを Service へ渡すようにつなぐ
     /// </summary>
+    [InitializeOrder(InitializeOrderConst.DefaultEarly)]
     public sealed class OmikujiEngineInitializer : InitializerBase
     {
         [SerializeField] private OmikujiEngineManager _engineManager;
