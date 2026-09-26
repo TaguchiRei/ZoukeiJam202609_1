@@ -1,5 +1,72 @@
 {
   "dependencies": {
+    "com.cysharp.unitask": {
+      "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "ceac8d6946b1125fe782cd171fbcb245b567dbf9"
+    },
+    "com.rei.usefultoolkit.aitool": {
+      "version": "https://github.com/TaguchiRei/UsefulToolkit.git?path=Packages/com.rei.usefultoolkit.aitool",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.rei.usefultoolkit.framework": "1.0.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "hash": "cdc1aa62d057f98042c4399f3b7b394b2896433a"
+    },
+    "com.rei.usefultoolkit.debugging": {
+      "version": "https://github.com/TaguchiRei/UsefulToolkit.git?path=Packages/com.rei.usefultoolkit.debugging",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.rei.usefultoolkit.framework": "1.0.0"
+      },
+      "hash": "cdc1aa62d057f98042c4399f3b7b394b2896433a"
+    },
+    "com.rei.usefultoolkit.framework": {
+      "version": "https://github.com/TaguchiRei/UsefulToolkit.git?path=Packages/com.rei.usefultoolkit.framework",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "cdc1aa62d057f98042c4399f3b7b394b2896433a"
+    },
+    "com.rei.usefultoolkit.gitsupport": {
+      "version": "https://github.com/TaguchiRei/UsefulToolkit.git?path=Packages/com.rei.usefultoolkit.gitsupport",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.rei.usefultoolkit.framework": "1.0.0"
+      },
+      "hash": "cdc1aa62d057f98042c4399f3b7b394b2896433a"
+    },
+    "com.rei.usefultoolkit.input": {
+      "version": "https://github.com/TaguchiRei/UsefulToolkit.git?path=Packages/com.rei.usefultoolkit.input",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.rei.usefultoolkit.framework": "1.0.0",
+        "com.unity.inputsystem": "1.18.0"
+      },
+      "hash": "cdc1aa62d057f98042c4399f3b7b394b2896433a"
+    },
+    "com.rei.usefultoolkit.worktrack": {
+      "version": "https://github.com/TaguchiRei/UsefulToolkit.git?path=Packages/com.rei.usefultoolkit.worktrack",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.rei.usefultoolkit.framework": "1.0.0"
+      },
+      "hash": "cdc1aa62d057f98042c4399f3b7b394b2896433a"
+    },
+    "com.unity.2d.sprite": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.10",
       "depth": 0,
@@ -16,6 +83,16 @@
       "dependencies": {
         "com.unity.mathematics": "1.2.1",
         "com.unity.modules.jsonserialize": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.cinemachine": {
+      "version": "3.1.7",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.splines": "2.0.0",
+        "com.unity.modules.imgui": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -89,7 +166,14 @@
     },
     "com.unity.nuget.mono-cecil": {
       "version": "1.11.6",
-      "depth": 3,
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.2.2",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -133,6 +217,13 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
+    "com.unity.settings-manager": {
+      "version": "2.1.1",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://packages.unity.com"
+    },
     "com.unity.shadergraph": {
       "version": "17.3.0",
       "depth": 1,
@@ -141,6 +232,17 @@
         "com.unity.render-pipelines.core": "17.3.0",
         "com.unity.searcher": "4.9.3"
       }
+    },
+    "com.unity.splines": {
+      "version": "2.8.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.mathematics": "1.2.1",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.settings-manager": "1.0.3"
+      },
+      "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
       "version": "1.6.0",
@@ -192,6 +294,17 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "io.github.hatayama.uloopmcp": {
+      "version": "https://github.com/hatayama/unity-cli-loop.git?path=/Packages/src",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.unity.nuget.mono-cecil": "1.11.6"
+      },
+      "hash": "d1563af0075f86527aa2f2b0f9036313f0634421"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
