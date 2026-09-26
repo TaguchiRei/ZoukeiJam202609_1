@@ -10,6 +10,7 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
 {
     /// <summary>
     /// ピストンのドラッグ入力からクランク角を更新し、クランク・ピストン・コンロッドの Transform に反映する。
+    /// 毎フレーム、クランクの動きを <see cref="CrankUpdatedHandler"/> で渡す。
     /// 回転は正転のみ。行程の途中で逆方向へドラッグすると直前に通過した死点まで戻り、そこで止まる
     /// </summary>
     public sealed class OmikujiEngineManager : InitializableMonoBehaviour
@@ -57,16 +58,17 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         private bool _topDeadCenterImpulseArmed;
         private float _grabOffset;
 
-        private OmikujiEngineState _state;
+        private CrankUpdatedHandler _onCrankUpdated;
+
+        /// <summary>現在のピストンの行程</summary>
+        public PistonStroke Stroke => StrokeAt(_angle);
 
         /// <summary>
-        /// シーン上の配置から寸法を読み取って State を登録し、入力の読み取りを開始する。
+        /// シーン上の配置から寸法を読み取り、入力の読み取りを開始する。
         /// 寸法は Crank・CrankPin・Piston がエンジンのローカル座標で初期配置にある前提で求める
         /// </summary>
         /// <param name="input">ドラッグ入力の読み取り元</param>
-        /// <param name="board">State の登録先</param>
-        /// <param name="sceneId">State を破棄するシーンの build index</param>
-        public void Initialize(IInputState input, OmikujiEngineBoard board, int sceneId)
+        public void Initialize(IInputState input)
         {
             _input = input;
 
@@ -81,10 +83,13 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             _reverseLimitAngle = PreviousDeadCenterAngle(_angle);
             _topDeadCenterImpulseArmed = !IsAtTopDeadCenter();
 
-            _state = new OmikujiEngineState(StrokeAt(_angle));
-            board.RegisterSceneState<IOmikujiEngineState>(_state, sceneId);
-
             base.Initialize();
+        }
+
+        /// <summary>毎フレームのクランクの動きを渡すコールバックを設定する</summary>
+        public void SetCrankUpdatedHandler(CrankUpdatedHandler onCrankUpdated)
+        {
+            _onCrankUpdated = onCrankUpdated;
         }
 
         private void Update()
@@ -96,7 +101,10 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             if (!pressed) _isDragging = false;
             _wasPressed = pressed;
 
+            float previousAngle = _angle;
             if (_isDragging) MovePistonTo(TargetHeightFrom(pointer.y));
+
+            _onCrankUpdated?.Invoke(_angle - previousAngle, RevolutionCount(), Stroke, Time.deltaTime);
         }
 
         /// <summary>
@@ -156,25 +164,17 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
                 ? Mathf.Max(firstDelta, secondDelta)
                 : Mathf.Abs(firstDelta) <= Mathf.Abs(secondDelta) ? firstDelta : secondDelta;
 
-            float previousAngle = _angle;
             _angle = Mathf.Max(_angle + delta, _reverseLimitAngle);
             _reverseLimitAngle = Mathf.Max(_reverseLimitAngle, PreviousDeadCenterAngle(_angle));
 
             ApplyPose();
-            UpdateState(_angle - previousAngle);
             NotifyTopDeadCenterArrival();
         }
 
-        /// <summary>
-        /// 現在のクランク角から回転数とピストンの行程を求め、State に書き込む。
-        /// 逆回転中かは、正転へ動いたら false、逆へ動いたら true にし、動かなかったときは前の値のまま
-        /// </summary>
-        /// <param name="angleChange">このフレームでのクランク角の変化量（rad）</param>
-        private void UpdateState(float angleChange)
+        /// <summary>初期状態から正転で上死点を通過した回数</summary>
+        private int RevolutionCount()
         {
-            bool isReversing = angleChange < 0f || (angleChange == 0f && _state.IsReversing);
-            int revolutionCount = TopDeadCenterPassCount(_angle) - TopDeadCenterPassCount(_initialAngle);
-            _state.Apply(revolutionCount, StrokeAt(_angle), isReversing);
+            return TopDeadCenterPassCount(_angle) - TopDeadCenterPassCount(_initialAngle);
         }
 
         /// <summary>
