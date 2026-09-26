@@ -3,7 +3,8 @@
     "rootNamespace": "ZoukeiJam1.Application",
     "references": [
         "ZoukeiJam1.BlackBoard.Runtime",
-        "UsefulToolkit.Framework.BlackBoard.Runtime"
+        "UsefulToolkit.Framework.BlackBoard.Runtime",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

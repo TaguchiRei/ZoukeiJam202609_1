@@ -6,7 +6,7 @@ namespace ZoukeiJam1.Application.Race
 {
     /// <summary>
     /// 走行の State を生成して登録し、毎フレーム、エンジンの回転速度から速度を求めて State に書き込む。
-    /// 走行中だけ、進んだ距離と経過時間を加算する
+    /// 走行中だけ、進んだ距離と経過時間を加算し、目標距離に届いたらゴール、制限時間を過ぎたらゲームオーバーにする
     /// </summary>
     public sealed class RaceService
     {
@@ -40,21 +40,43 @@ namespace ZoukeiJam1.Application.Race
             _state.Apply(RacePhase.Running, _state.Distance, _state.ElapsedTime, _state.Speed);
         }
 
-        /// <summary>1 フレーム分、速度を求め、走行中なら距離と経過時間を加算する</summary>
+        /// <summary>
+        /// 1 フレーム分、速度を求め、走行中なら距離と経過時間を加算して、ゴールと時間切れを判定する。
+        /// ゴールしたときの経過時間は、フレームの途中で目標距離に届いた時刻を速度から求めた値にする
+        /// </summary>
         /// <param name="deltaTime">前のフレームからの経過時間（秒）</param>
         public void Update(float deltaTime)
         {
             float speed = Mathf.Max(0f, _engineState.RotationSpeed * _distancePerRevolution);
+            RacePhase phase = _state.Phase;
             float distance = _state.Distance;
             float elapsedTime = _state.ElapsedTime;
 
-            if (_state.Phase == RacePhase.Running)
+            if (phase == RacePhase.Running)
             {
-                distance += speed * deltaTime;
-                elapsedTime += deltaTime;
+                float remainingDistance = _state.GoalDistance - distance;
+                float goalTime = speed > 0f ? elapsedTime + remainingDistance / speed : float.PositiveInfinity;
+
+                if (speed * deltaTime >= remainingDistance && goalTime <= _state.TimeLimit)
+                {
+                    phase = RacePhase.Goal;
+                    distance = _state.GoalDistance;
+                    elapsedTime = goalTime;
+                }
+                else if (elapsedTime + deltaTime >= _state.TimeLimit)
+                {
+                    phase = RacePhase.GameOver;
+                    distance += speed * (_state.TimeLimit - elapsedTime);
+                    elapsedTime = _state.TimeLimit;
+                }
+                else
+                {
+                    distance += speed * deltaTime;
+                    elapsedTime += deltaTime;
+                }
             }
 
-            _state.Apply(_state.Phase, distance, elapsedTime, speed);
+            _state.Apply(phase, distance, elapsedTime, speed);
         }
     }
 }

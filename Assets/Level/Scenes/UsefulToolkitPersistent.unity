@@ -133,6 +133,7 @@ GameObject:
   - component: {fileID: 849832310}
   - component: {fileID: 849832312}
   - component: {fileID: 849832311}
+  - component: {fileID: 849832313}
   m_Layer: 0
   m_Name: UsefulToolkit System
   m_TagString: Untagged
@@ -196,6 +197,7 @@ MonoBehaviour:
   _runtimeInitializer: {fileID: 849832307}
   _startScene: Assets/Level/Scenes/EngineScene.unity
   _inputInitializer: {fileID: 849832312}
+  _gameResultInitializer: {fileID: 849832313}
 --- !u!114 &849832311
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,6 +232,18 @@ MonoBehaviour:
     - rid: 7262520074954080449
       type: {class: InputManager, ns: UsefulToolkit.Application.Input, asm: UsefulToolkit.Input.Application.Runtime}
       data: 
+--- !u!114 &849832313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849832306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fa7a45e71640244da1d73e5d11c30ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ZoukeiJam1.Initialization.Runtime::ZoukeiJam1.Initialization.Race.GameResultInitializer
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
