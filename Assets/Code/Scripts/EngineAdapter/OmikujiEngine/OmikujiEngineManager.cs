@@ -29,6 +29,9 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         [SerializeField] private Camera _camera;
         [SerializeField] private bool _clockwise = true;
 
+        [Tooltip("死点へ近づく途中で、この距離（エンジンのローカル座標）以内に入ったら死点に到達したとみなす")]
+        [SerializeField, Min(0f)] private float _deadCenterSnapDistance = 0.02f;
+
         private IInputState _input;
         private OmikujiEngineGeometry _geometry;
         private float _initialAngle;
@@ -82,14 +85,31 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
 
         /// <summary>
         /// ポインタの高さからピストンの目標高さを求める。
-        /// 下死点〜上死点を越えた分は掴んだ位置のずれに吸収し、折り返した瞬間からピストンが追従するようにする
+        /// 下死点〜上死点を越えた分と死点へ吸い付かせた分は掴んだ位置のずれに吸収し、
+        /// 折り返した瞬間からピストンが追従するようにする
         /// </summary>
         private float TargetHeightFrom(float pointerHeight)
         {
             float target = pointerHeight + _grabOffset;
-            float clamped = _geometry.ClampHeight(target);
-            _grabOffset += clamped - target;
-            return clamped;
+            float adjusted = SnapToDeadCenter(_geometry.ClampHeight(target), _piston.localPosition.y);
+            _grabOffset += adjusted - target;
+            return adjusted;
+        }
+
+        /// <summary>
+        /// 死点へ近づく向きに動いていて、その死点から _deadCenterSnapDistance 以内に入った高さを死点の高さに揃える。
+        /// 離れる向きでは揃えない。揃えると、ゆっくり動かしたときに死点へ吸い戻されて離れられなくなる
+        /// </summary>
+        private float SnapToDeadCenter(float height, float currentHeight)
+        {
+            bool movingUp = height > currentHeight;
+            bool movingDown = height < currentHeight;
+
+            if (movingUp && _geometry.TopDeadCenterHeight - height <= _deadCenterSnapDistance)
+                return _geometry.TopDeadCenterHeight;
+            if (movingDown && height - _geometry.BottomDeadCenterHeight <= _deadCenterSnapDistance)
+                return _geometry.BottomDeadCenterHeight;
+            return height;
         }
 
         /// <summary>スクリーン座標をエンジンのローカル座標に変換する</summary>
