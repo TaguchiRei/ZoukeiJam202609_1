@@ -2563,7 +2563,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4d3897f5c29fe74980f1e02b5e89487, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ZoukeiJam1.Initialization.Runtime::ZoukeiJam1.Initialization.Race.RaceInitializer
-  _settings: {fileID: 11400000, guid: a26f9ff92c85c1c45b87c98569e8ef18, type: 2}
+  _raceSettings: {fileID: 11400000, guid: a26f9ff92c85c1c45b87c98569e8ef18, type: 2}
+  _resultSettings: {fileID: 11400000, guid: b8a2fc8da7ea4f34680d6b2d4d792535, type: 2}
   _ticker: {fileID: 121826966}
   _startCountdown: {fileID: 953289436}
   _hud: {fileID: 953289437}

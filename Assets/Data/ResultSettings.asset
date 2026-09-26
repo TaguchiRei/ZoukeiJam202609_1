@@ -9,33 +9,41 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e423b7dfa6391184a806280a756db195, type: 3}
-  m_Name: GameRuleSettings
-  m_EditorClassIdentifier: ZoukeiJam1.Initialization.Runtime::ZoukeiJam1.Initialization.Race.GameRuleSettings
+  m_Script: {fileID: 11500000, guid: ff7e48ae6a4885f46b1dfdcd875d2223, type: 3}
+  m_Name: ResultSettings
+  m_EditorClassIdentifier: ZoukeiJam1.Initialization.Runtime::ZoukeiJam1.Initialization.Result.ResultSettings
+  _baseScoreMultiplier: 1
   _omikujiEntries:
   - _fortune: 0
     _probabilityAtMinSpeed: 2
     _probabilityAtMaxSpeed: 40
     _confessionRateMultiplier: 1.5
+    _scoreMultiplier: 1
   - _fortune: 1
     _probabilityAtMinSpeed: 8
     _probabilityAtMaxSpeed: 30
     _confessionRateMultiplier: 1.2
+    _scoreMultiplier: 0.6
   - _fortune: 2
     _probabilityAtMinSpeed: 20
     _probabilityAtMaxSpeed: 15
     _confessionRateMultiplier: 1
+    _scoreMultiplier: 0.3
   - _fortune: 3
     _probabilityAtMinSpeed: 30
     _probabilityAtMaxSpeed: 10
     _confessionRateMultiplier: 0.9
+    _scoreMultiplier: 0.2
   - _fortune: 4
     _probabilityAtMinSpeed: 40
     _probabilityAtMaxSpeed: 5
     _confessionRateMultiplier: 0.5
+    _scoreMultiplier: 0
   _minSpeedKmh: 30
   _maxSpeedKmh: 120
   _totalProbabilityAtMinSpeed: 0
   _totalProbabilityAtMaxSpeed: 0
-  _confessionBaseRate: 50
-  _confessionSuccessScoreMultiplier: 2
+  _confessionRatePerRemainingSecond: 1
+  _confessionSuccessScoreMultiplier: 1
+  _bouquetThreshold: 40
+  _ringThreshold: 70
