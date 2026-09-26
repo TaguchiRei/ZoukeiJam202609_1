@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 using UsefulToolkit.Initialization;
 using ZoukeiJam1.BlackBoard.Race;
 
@@ -9,13 +9,13 @@ namespace ZoukeiJam1.EngineAdapter.Race
     public sealed class RaceHud : InitializableMonoBehaviour
     {
         [Tooltip("残り時間を表示する Text")]
-        [SerializeField] private Text _timeText;
+        [SerializeField] private TMP_Text _timeText;
 
         [Tooltip("進んだ距離と目標距離を表示する Text")]
-        [SerializeField] private Text _distanceText;
+        [SerializeField] private TMP_Text _distanceText;
 
         [Tooltip("速度を表示する Text")]
-        [SerializeField] private Text _speedText;
+        [SerializeField] private TMP_Text _speedText;
 
         private IRaceState _raceState;
 

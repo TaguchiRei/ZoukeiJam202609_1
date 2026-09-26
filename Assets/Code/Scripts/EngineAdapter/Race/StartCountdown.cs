@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 namespace ZoukeiJam1.EngineAdapter.Race
 {
@@ -12,7 +12,7 @@ namespace ZoukeiJam1.EngineAdapter.Race
     public sealed class StartCountdown : MonoBehaviour
     {
         [Tooltip("カウントダウンを表示する Text")]
-        [SerializeField] private Text _text;
+        [SerializeField] private TMP_Text _text;
 
         [Tooltip("カウントダウンを始める数")]
         [SerializeField, Min(1)] private int _count = 3;

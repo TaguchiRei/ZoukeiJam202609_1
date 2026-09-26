@@ -8,7 +8,8 @@
         "UsefulToolkit.Framework.EngineAdapter.Runtime",
         "UsefulToolkit.Input.BlackBoard.Runtime",
         "Unity.Cinemachine",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
