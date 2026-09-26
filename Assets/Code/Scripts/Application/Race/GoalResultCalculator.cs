@@ -1,4 +1,5 @@
 using UnityEngine;
+using ZoukeiJam1.BlackBoard.Race;
 
 namespace ZoukeiJam1.Application.Race
 {
@@ -7,9 +8,6 @@ namespace ZoukeiJam1.Application.Race
     /// </summary>
     public sealed class GoalResultCalculator
     {
-        /// <summary>1 ユニット = 1 m として、ユニット/秒を km/h に直す係数</summary>
-        private const float UnitsPerSecondToKmh = 3.6f;
-
         private readonly OmikujiTable _omikujiTable;
         private readonly float _confessionBaseRate;
         private readonly float _confessionSuccessScoreMultiplier;
@@ -30,8 +28,8 @@ namespace ZoukeiJam1.Application.Race
         /// <param name="goalSpeed">ゴールした瞬間の速度（ユニット/秒）</param>
         public GoalResult Calculate(float goalDistance, float elapsedTime, float goalSpeed)
         {
-            float averageSpeedKmh = elapsedTime > 0f ? goalDistance / elapsedTime * UnitsPerSecondToKmh : 0f;
-            float goalSpeedKmh = goalSpeed * UnitsPerSecondToKmh;
+            float averageSpeedKmh = elapsedTime > 0f ? SpeedUnit.ToKmh(goalDistance / elapsedTime) : 0f;
+            float goalSpeedKmh = SpeedUnit.ToKmh(goalSpeed);
 
             var entry = _omikujiTable.Draw(goalSpeedKmh);
             float successRate = Mathf.Clamp(_confessionBaseRate * entry.ConfessionRateMultiplier, 0f, 100f);

@@ -7,7 +7,8 @@
         "UsefulToolkit.Framework.BlackBoard.Runtime",
         "UsefulToolkit.Framework.EngineAdapter.Runtime",
         "UsefulToolkit.Input.BlackBoard.Runtime",
-        "Unity.Cinemachine"
+        "Unity.Cinemachine",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

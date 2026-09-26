@@ -5,10 +5,20 @@ using ZoukeiJam1.BlackBoard.Race;
 
 namespace ZoukeiJam1.Initialization.Race
 {
-    /// <summary>おみくじ・告白・スコアのルールの設定値。設定値から GoalResultCalculator を生成する</summary>
+    /// <summary>走行・おみくじ・告白・スコアのルールの設定値。設定値から GoalResultCalculator を生成する</summary>
     [CreateAssetMenu(fileName = "GameRuleSettings", menuName = "ZoukeiJam1/GameRuleSettings")]
     public sealed class GameRuleSettings : ScriptableObject
     {
+        [Header("走行")]
+        [Tooltip("目標距離（m）")]
+        [SerializeField, Min(0.01f)] private float _goalDistance = 300f;
+
+        [Tooltip("制限時間（秒）。開始演出が終わってから数える")]
+        [SerializeField, Min(0.01f)] private float _timeLimit = 30f;
+
+        [Tooltip("エンジンが 1 回転するごとに進む距離（m）。速度はエンジンの回転速度（回転/秒）にこの値を掛けたものになる")]
+        [SerializeField, Min(0f)] private float _distancePerRevolution = 5f;
+
         [Header("おみくじ")]
         [Tooltip("各結果の、最低速度・最高速度での確率（%）と告白の倍率。確率は合計が 100 でなくても、合計に対する割合で引く")]
         [SerializeField] private OmikujiEntry[] _omikujiEntries =
@@ -38,6 +48,15 @@ namespace ZoukeiJam1.Initialization.Race
 
         [Tooltip("告白が成功したときに、平均時速へ掛ける倍率")]
         [SerializeField, Min(0f)] private float _confessionSuccessScoreMultiplier = 2f;
+
+        /// <summary>目標距離（m）</summary>
+        public float GoalDistance => _goalDistance;
+
+        /// <summary>制限時間（秒）</summary>
+        public float TimeLimit => _timeLimit;
+
+        /// <summary>エンジンが 1 回転するごとに進む距離（m）</summary>
+        public float DistancePerRevolution => _distancePerRevolution;
 
         public GoalResultCalculator CreateGoalResultCalculator()
         {

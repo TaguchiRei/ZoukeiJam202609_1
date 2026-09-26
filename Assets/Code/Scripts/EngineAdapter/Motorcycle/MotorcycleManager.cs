@@ -1,11 +1,11 @@
 using UnityEngine;
 using UsefulToolkit.Initialization;
-using ZoukeiJam1.BlackBoard.OmikujiEngine;
+using ZoukeiJam1.BlackBoard.Race;
 
 namespace ZoukeiJam1.EngineAdapter.Motorcycle
 {
     /// <summary>
-    /// エンジンの回転速度から走行速度を求め、タイヤの回転と車体の上下振動を計算して Transform に反映する。
+    /// 走行の State の速度から、タイヤの回転と車体の上下振動を計算して Transform に反映する。
     /// バイク自体はその場から動かさない。速度の単位はユニット/秒
     /// </summary>
     public sealed class MotorcycleManager : InitializableMonoBehaviour
@@ -23,9 +23,6 @@ namespace ZoukeiJam1.EngineAdapter.Motorcycle
 
         [Tooltip("タイヤの半径（ユニット）")]
         [SerializeField, Min(0.01f)] private float _tireRadius = 1.69f;
-
-        [Tooltip("エンジンが 1 回転するごとに進む距離（ユニット）。速度はエンジンの回転速度（回転/秒）にこの値を掛けたものになる")]
-        [SerializeField, Min(0f)] private float _distancePerRevolution = 5f;
 
         [Header("小さい振動")]
         [Tooltip("振幅（ユニット）")]
@@ -71,13 +68,13 @@ namespace ZoukeiJam1.EngineAdapter.Motorcycle
         /// <summary>現在の速度（ユニット/秒）</summary>
         public float Speed { get; private set; }
 
-        private IOmikujiEngineState _engineState;
+        private IRaceState _raceState;
 
         /// <summary>車体の初期位置を振動の基準として記録し、動作を開始する</summary>
-        /// <param name="engineState">速度の元になるエンジンの回転速度の読み取り元</param>
-        public void Initialize(IOmikujiEngineState engineState)
+        /// <param name="raceState">速度の読み取り元</param>
+        public void Initialize(IRaceState raceState)
         {
-            _engineState = engineState;
+            _raceState = raceState;
             _bodyBasePosition = _body.localPosition;
             _distanceUntilBump = NextBumpInterval();
 
@@ -92,7 +89,7 @@ namespace ZoukeiJam1.EngineAdapter.Motorcycle
 
         private void Update()
         {
-            SetSpeed(_engineState.RotationSpeed * _distancePerRevolution);
+            SetSpeed(_raceState.Speed);
             float distance = Speed * Time.deltaTime;
 
             RotateWheels(distance);
