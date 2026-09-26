@@ -1,0 +1,17 @@
+{
+    "name": "ZoukeiJam1.Application.Runtime",
+    "rootNamespace": "ZoukeiJam1.Application",
+    "references": [
+        "ZoukeiJam1.BlackBoard.Runtime",
+        "UsefulToolkit.Framework.BlackBoard.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
