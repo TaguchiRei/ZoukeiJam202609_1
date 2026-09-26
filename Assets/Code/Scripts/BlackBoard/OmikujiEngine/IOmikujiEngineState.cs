@@ -18,6 +18,9 @@ namespace ZoukeiJam1.BlackBoard.OmikujiEngine
         /// <summary>エンジンの回転速度（回転/秒）。変化の通知は行わない</summary>
         float RotationSpeed { get; }
 
+        /// <summary>正転方向に積算したクランク角（rad）。0 でクランクピンがクランク中心の真上に来る。変化の通知は行わない</summary>
+        float CrankAngle { get; }
+
         /// <summary>RevolutionCount の変化時に実行する Action を登録する</summary>
         /// <returns>Dispose すると登録を解除できる</returns>
         IDisposable RegisterEventOnRevolutionCountChanged(ActionEntry<StateContext<int>> changedAction);

@@ -42,9 +42,9 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         [SerializeField, Min(0f)] private float _topDeadCenterImpulseRearmDistance = 0.1f;
 
         private IInputState _input;
+        private OmikujiEngineRig _rig;
         private OmikujiEngineGeometry _geometry;
         private float _initialAngle;
-        private Vector2 _initialRodDirection;
 
         /// <summary>正転方向に積算したクランク角（rad）</summary>
         private float _angle;
@@ -63,6 +63,9 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         /// <summary>現在のピストンの行程</summary>
         public PistonStroke Stroke => StrokeAt(_angle);
 
+        /// <summary>正転方向に積算したクランク角（rad）</summary>
+        public float CrankAngle => _angle;
+
         /// <summary>
         /// シーン上の配置から寸法を読み取り、入力の読み取りを開始する。
         /// 寸法は Crank・CrankPin・Piston がエンジンのローカル座標で初期配置にある前提で求める
@@ -72,13 +75,9 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         {
             _input = input;
 
-            Vector2 crankCenter = _crank.localPosition;
-            Vector2 crankPin = crankCenter + (Vector2)(_crank.localRotation * _crankPin.localPosition);
-            Vector2 pistonPin = _piston.localPosition;
-
-            _geometry = new OmikujiEngineGeometry(crankCenter, crankPin, pistonPin, _clockwise);
-            _initialAngle = _geometry.AngleOf(crankPin);
-            _initialRodDirection = crankPin - pistonPin;
+            _rig = new OmikujiEngineRig(_crank, _crankPin, _piston, _arm, _clockwise);
+            _geometry = _rig.Geometry;
+            _initialAngle = _rig.InitialAngle;
             _angle = _initialAngle;
             _reverseLimitAngle = PreviousDeadCenterAngle(_angle);
             _topDeadCenterImpulseArmed = !IsAtTopDeadCenter();
@@ -104,7 +103,7 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             float previousAngle = _angle;
             if (_isDragging) MovePistonTo(TargetHeightFrom(pointer.y));
 
-            _onCrankUpdated?.Invoke(_angle - previousAngle, RevolutionCount(), Stroke, Time.deltaTime);
+            _onCrankUpdated?.Invoke(_angle, _angle - previousAngle, RevolutionCount(), Stroke, Time.deltaTime);
         }
 
         /// <summary>
@@ -167,7 +166,7 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             _angle = Mathf.Max(_angle + delta, _reverseLimitAngle);
             _reverseLimitAngle = Mathf.Max(_reverseLimitAngle, PreviousDeadCenterAngle(_angle));
 
-            ApplyPose();
+            _rig.ApplyPose(_angle);
             NotifyTopDeadCenterArrival();
         }
 
@@ -238,18 +237,6 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             float top = probe - Mathf.Repeat(probe - _geometry.TopDeadCenterAngle, TwoPi);
             float bottom = probe - Mathf.Repeat(probe - _geometry.BottomDeadCenterAngle, TwoPi);
             return Mathf.Max(top, bottom);
-        }
-
-        /// <summary>現在のクランク角をクランク・ピストン・コンロッドの Transform に反映する</summary>
-        private void ApplyPose()
-        {
-            Vector2 crankPin = _geometry.CrankPinAt(_angle);
-            Vector2 pistonPin = _geometry.PistonPinAt(_angle);
-
-            float crankDegrees = -(_clockwise ? 1f : -1f) * (_angle - _initialAngle) * Mathf.Rad2Deg;
-            _crank.localRotation = Quaternion.Euler(0f, 0f, crankDegrees);
-            _piston.localPosition = new Vector3(pistonPin.x, pistonPin.y, _piston.localPosition.z);
-            _arm.localRotation = Quaternion.Euler(0f, 0f, Vector2.SignedAngle(_initialRodDirection, crankPin - pistonPin));
         }
 
         /// <summary>角度を (-π, π] に収める</summary>
