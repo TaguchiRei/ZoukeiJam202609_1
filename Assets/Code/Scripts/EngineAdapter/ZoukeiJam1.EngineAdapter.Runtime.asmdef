@@ -7,7 +7,12 @@
         "UsefulToolkit.Framework.BlackBoard.Runtime",
         "UsefulToolkit.Framework.EngineAdapter.Runtime",
         "UsefulToolkit.Input.BlackBoard.Runtime",
-        "Unity.Cinemachine"
+        "Unity.Cinemachine",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "LitMotion",
+        "LitMotion.Extensions",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
