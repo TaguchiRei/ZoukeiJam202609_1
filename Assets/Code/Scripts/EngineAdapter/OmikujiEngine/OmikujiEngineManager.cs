@@ -77,7 +77,19 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             if (!pressed) _isDragging = false;
             _wasPressed = pressed;
 
-            if (_isDragging) MovePistonTo(pointer.y + _grabOffset);
+            if (_isDragging) MovePistonTo(TargetHeightFrom(pointer.y));
+        }
+
+        /// <summary>
+        /// ポインタの高さからピストンの目標高さを求める。
+        /// 下死点〜上死点を越えた分は掴んだ位置のずれに吸収し、折り返した瞬間からピストンが追従するようにする
+        /// </summary>
+        private float TargetHeightFrom(float pointerHeight)
+        {
+            float target = pointerHeight + _grabOffset;
+            float clamped = _geometry.ClampHeight(target);
+            _grabOffset += clamped - target;
+            return clamped;
         }
 
         /// <summary>スクリーン座標をエンジンのローカル座標に変換する</summary>
@@ -99,7 +111,7 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         /// <summary>ピストンを目標の高さへ動かすクランク角を選び、各部品へ反映する</summary>
         private void MovePistonTo(float targetHeight)
         {
-            var (first, second) = _geometry.SolveAngles(_geometry.ClampHeight(targetHeight));
+            var (first, second) = _geometry.SolveAngles(targetHeight);
             float firstDelta = WrapPi(first - _angle);
             float secondDelta = WrapPi(second - _angle);
 
