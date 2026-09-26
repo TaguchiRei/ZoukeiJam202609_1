@@ -4,6 +4,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UsefulToolkit.BlackBoard.Input;
 using UsefulToolkit.Initialization;
+using ZoukeiJam1.BlackBoard.OmikujiEngine;
 
 namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
 {
@@ -56,14 +57,16 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         private bool _topDeadCenterImpulseArmed;
         private float _grabOffset;
 
-        /// <summary>初期状態から正転した回数</summary>
-        public int RevolutionCount => Mathf.FloorToInt((_angle - _initialAngle) / TwoPi);
+        private OmikujiEngineState _state;
 
         /// <summary>
-        /// シーン上の配置から寸法を読み取り、入力の読み取りを開始する。
+        /// シーン上の配置から寸法を読み取って State を登録し、入力の読み取りを開始する。
         /// 寸法は Crank・CrankPin・Piston がエンジンのローカル座標で初期配置にある前提で求める
         /// </summary>
-        public void Initialize(IInputState input)
+        /// <param name="input">ドラッグ入力の読み取り元</param>
+        /// <param name="board">State の登録先</param>
+        /// <param name="sceneId">State を破棄するシーンの build index</param>
+        public void Initialize(IInputState input, OmikujiEngineBoard board, int sceneId)
         {
             _input = input;
 
@@ -77,6 +80,9 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
             _angle = _initialAngle;
             _reverseLimitAngle = PreviousDeadCenterAngle(_angle);
             _topDeadCenterImpulseArmed = !IsAtTopDeadCenter();
+
+            _state = new OmikujiEngineState(StrokeAt(_angle));
+            board.RegisterSceneState<IOmikujiEngineState>(_state, sceneId);
 
             base.Initialize();
         }
@@ -150,11 +156,45 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
                 ? Mathf.Max(firstDelta, secondDelta)
                 : Mathf.Abs(firstDelta) <= Mathf.Abs(secondDelta) ? firstDelta : secondDelta;
 
+            float previousAngle = _angle;
             _angle = Mathf.Max(_angle + delta, _reverseLimitAngle);
             _reverseLimitAngle = Mathf.Max(_reverseLimitAngle, PreviousDeadCenterAngle(_angle));
 
             ApplyPose();
+            UpdateState(_angle - previousAngle);
             NotifyTopDeadCenterArrival();
+        }
+
+        /// <summary>
+        /// 現在のクランク角から回転数とピストンの行程を求め、State に書き込む。
+        /// 逆回転中かは、正転へ動いたら false、逆へ動いたら true にし、動かなかったときは前の値のまま
+        /// </summary>
+        /// <param name="angleChange">このフレームでのクランク角の変化量（rad）</param>
+        private void UpdateState(float angleChange)
+        {
+            bool isReversing = angleChange < 0f || (angleChange == 0f && _state.IsReversing);
+            int revolutionCount = TopDeadCenterPassCount(_angle) - TopDeadCenterPassCount(_initialAngle);
+            _state.Apply(revolutionCount, StrokeAt(_angle), isReversing);
+        }
+
+        /// <summary>
+        /// 基準の上死点から指定角までに通過した上死点の数。
+        /// 逆回転は直前の死点で止まるため、この値が減ることはない
+        /// </summary>
+        private int TopDeadCenterPassCount(float angle)
+        {
+            // 上死点ちょうどの角度が浮動小数の誤差で通過前と判定されないよう、わずかに進めて求める
+            float probe = angle + DeadCenterAngleTolerance;
+            return Mathf.FloorToInt((probe - _geometry.TopDeadCenterAngle) / TwoPi);
+        }
+
+        /// <summary>指定角でのピストンの行程。直前に通過した死点が上死点なら Down、下死点なら Up</summary>
+        private PistonStroke StrokeAt(float angle)
+        {
+            float probe = angle + DeadCenterAngleTolerance;
+            float sinceTop = Mathf.Repeat(probe - _geometry.TopDeadCenterAngle, TwoPi);
+            float sinceBottom = Mathf.Repeat(probe - _geometry.BottomDeadCenterAngle, TwoPi);
+            return sinceTop < sinceBottom ? PistonStroke.Down : PistonStroke.Up;
         }
 
         /// <summary>
