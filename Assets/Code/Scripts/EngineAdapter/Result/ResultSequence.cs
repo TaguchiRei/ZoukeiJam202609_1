@@ -11,7 +11,8 @@ namespace ZoukeiJam1.EngineAdapter.Result
 {
     /// <summary>
     /// ゴールしたときの結果を、リザルト画面の演出として順番に見せる。
-    /// 明転 → 平均時速・基礎スコア → おみくじが降りてきて倍率を出す → おみくじの加算 → 最終スコア → ボタン、の順に進める。
+    /// 明転 → 平均時速・基礎スコア → おみくじが降りてきて倍率を出す → おみくじの加算 → おみくじが告白アイテムに吸い込まれてアイテムと成功率を出す →
+    /// 告白ムービー → 告白の成否の文字 → 成功なら告白の加算 → 最終スコア → ボタン、の順に進める。
     /// どちらかのボタンを押したら、両方のボタンを押せなくする
     /// </summary>
     public sealed class ResultSequence : MonoBehaviour
@@ -26,10 +27,14 @@ namespace ZoukeiJam1.EngineAdapter.Result
         [SerializeField] private ResultScoreRow _averageSpeedRow;
         [SerializeField] private ResultScoreRow _baseScoreRow;
         [SerializeField] private ResultScoreRow _omikujiBonusRow;
+        [SerializeField] private ResultScoreRow _confessionBonusRow;
         [SerializeField] private ResultScoreRow _finalScoreRow;
 
         [Tooltip("おみくじの加算の行の見出しの書式。{0} にスコアの倍率が入る")]
         [SerializeField] private string _omikujiBonusLabelFormat = "おみくじ ×{0:0.##}";
+
+        [Tooltip("告白の加算の行の見出しの書式。{0} にスコアの倍率が入る")]
+        [SerializeField] private string _confessionBonusLabelFormat = "告白成功 ×{0:0.##}";
 
         [Tooltip("行のフェードインにかける時間（秒）")]
         [SerializeField, Min(0f)] private float _rowFadeSeconds = 0.25f;
@@ -48,6 +53,35 @@ namespace ZoukeiJam1.EngineAdapter.Result
 
         [Tooltip("告白成功率の倍率の文字を出すのにかける時間（秒）")]
         [SerializeField, Min(0f)] private float _multiplierPopSeconds = 0.35f;
+
+        [Tooltip("おみくじが告白アイテムに吸い込まれるのにかける時間（秒）")]
+        [SerializeField, Min(0f)] private float _omikujiSuckSeconds = 0.6f;
+
+        [Header("告白アイテム")]
+        [SerializeField] private ConfessionItemView _confessionItem;
+
+        [Tooltip("告白アイテムが変わるときの拡大にかける時間（秒）")]
+        [SerializeField, Min(0f)] private float _itemPopSeconds = 0.4f;
+
+        [Header("告白ムービー")]
+        [SerializeField] private ConfessionMovie _confessionMovie;
+
+        [Header("告白の成否")]
+        [SerializeField] private ResultBanner _banner;
+
+        [SerializeField] private string _successText = "告白成功！";
+        [SerializeField] private Color _successColor = new(1f, 0.6f, 0.75f);
+        [SerializeField] private string _failureText = "振られてしまった...";
+        [SerializeField] private Color _failureColor = new(0.6f, 0.7f, 1f);
+
+        [Tooltip("成否の文字の拡大にかける時間（秒）")]
+        [SerializeField, Min(0f)] private float _bannerPopSeconds = 0.3f;
+
+        [Tooltip("成否の文字を表示しておく時間（秒）")]
+        [SerializeField, Min(0f)] private float _bannerHoldSeconds = 1.2f;
+
+        [Tooltip("成否の文字のフェードアウトにかける時間（秒）")]
+        [SerializeField, Min(0f)] private float _bannerFadeSeconds = 0.6f;
 
         [Header("間")]
         [Tooltip("各段階の間に置く待ち時間（秒）")]
@@ -79,8 +113,12 @@ namespace ZoukeiJam1.EngineAdapter.Result
             _averageSpeedRow.Hide();
             _baseScoreRow.Hide();
             _omikujiBonusRow.Hide();
+            _confessionBonusRow.Hide();
             _finalScoreRow.Hide();
             _omikujiPaper.Prepare(ToDisplayName(result.Fortune), result.ConfessionRateMultiplier, _omikujiDropHeight);
+            _confessionItem.Prepare();
+            _confessionMovie.Hide();
+            _banner.Hide();
             _buttons.SetActive(false);
 
             _retryButtonLabel.text = result.IsConfessionSucceeded ? _retryLabelOnSuccess : _retryLabelOnFailure;
@@ -105,6 +143,26 @@ namespace ZoukeiJam1.EngineAdapter.Result
             string omikujiLabel = string.Format(_omikujiBonusLabelFormat, result.OmikujiScoreMultiplier);
             await _omikujiBonusRow.ShowAsync(omikujiLabel, result.OmikujiBonus, _rowFadeSeconds, _countUpSeconds, token);
             await WaitIntervalAsync(token);
+
+            await _omikujiPaper.SuckIntoAsync(_confessionItem.Target, _omikujiSuckSeconds, token);
+            await _confessionItem.ChangeAsync(
+                result.ConfessionItem, result.ConfessionSuccessRate, _itemPopSeconds, _countUpSeconds, token);
+            await WaitIntervalAsync(token);
+
+            await _confessionMovie.PlayAsync(token);
+
+            bool isSucceeded = result.IsConfessionSucceeded;
+            await _banner.ShowAsync(
+                isSucceeded ? _successText : _failureText, isSucceeded ? _successColor : _failureColor,
+                _bannerPopSeconds, _bannerHoldSeconds, _bannerFadeSeconds, token);
+
+            if (isSucceeded)
+            {
+                string confessionLabel = string.Format(_confessionBonusLabelFormat, result.ConfessionScoreMultiplier);
+                await _confessionBonusRow.ShowAsync(
+                    confessionLabel, result.ConfessionBonus, _rowFadeSeconds, _countUpSeconds, token);
+                await WaitIntervalAsync(token);
+            }
 
             await _finalScoreRow.ShowAsync(null, result.FinalScore, _rowFadeSeconds, _countUpSeconds, token);
             await WaitIntervalAsync(token);

@@ -54,6 +54,28 @@ namespace ZoukeiJam1.EngineAdapter.Result
                 .ToUniTask(cancellationToken);
         }
 
+        /// <summary>紙を回転させながら、縮めて指定した位置へ動かし、見えなくする</summary>
+        /// <param name="target">吸い込まれる先</param>
+        /// <param name="duration">吸い込まれるのにかける時間（秒）</param>
+        public UniTask SuckIntoAsync(RectTransform target, float duration, CancellationToken cancellationToken)
+        {
+            Vector3 targetPosition = _paper.parent.InverseTransformPoint(target.position);
+
+            return UniTask.WhenAll(
+                LMotion.Create(_paper.localPosition, targetPosition, duration)
+                    .WithEase(Ease.InCubic)
+                    .BindToLocalPosition(_paper)
+                    .ToUniTask(cancellationToken),
+                LMotion.Create(Vector3.one, Vector3.zero, duration)
+                    .WithEase(Ease.InCubic)
+                    .BindToLocalScale(_paper)
+                    .ToUniTask(cancellationToken),
+                LMotion.Create(0f, 360f, duration)
+                    .WithEase(Ease.InCubic)
+                    .BindToLocalEulerAnglesZ(_paper)
+                    .ToUniTask(cancellationToken));
+        }
+
         /// <summary>倍率の文字を拡大しながら出す</summary>
         /// <param name="duration">出すのにかける時間（秒）</param>
         public UniTask ShowMultiplierAsync(float duration, CancellationToken cancellationToken)
