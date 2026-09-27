@@ -1,0 +1,80 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: ScrollingScenery
+  m_Shader: {fileID: 4800000, guid: 68fb89746cfcb2f4bb2399ad235fdc57, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _CloudCoverage: 0.45
+    - _CloudDriftSpeed: 0.3
+    - _CloudParallax: 0.03
+    - _CloudScale: 0.18
+    - _CurbHeight: 0.22
+    - _CurbLength: 1
+    - _CurbParallax: 0.9
+    - _FarFrequency: 0.09
+    - _FarParallax: 0.08
+    - _FieldParallax: 0.55
+    - _FieldStripeFrequency: 0.6
+    - _GrassParallax: 1.4
+    - _GroundY: -3
+    - _HorizonHeight: 2
+    - _LaneDepth: 0.9
+    - _LaneHeight: 0.12
+    - _LaneParallax: 1.15
+    - _MaxBlurLength: 2
+    - _NearFrequency: 0.22
+    - _NearParallax: 0.25
+    - _PoleHeight: 5.5
+    - _PoleInterval: 9
+    - _PoleParallax: 0.7
+    - _PoleWidth: 0.16
+    - _RoadGrainFrequency: 4
+    - _RoadGrainStrength: 0.12
+    - _ScrollDistance: 0
+    - _ScrollSpeed: 0
+    - _ShutterTime: 0.025
+    - _SkyGradientHeight: 8
+    m_Colors:
+    - _CloudColor: {r: 1, g: 1, b: 1, a: 0.9}
+    - _CloudRange: {r: 3, g: 8, b: 0, a: 0}
+    - _CurbColorA: {r: 0.9, g: 0.24999997, b: 0.19999996, a: 1}
+    - _CurbColorB: {r: 0.95, g: 0.95, b: 0.95, a: 1}
+    - _FarColor: {r: 0.54999995, g: 0.68, b: 0.85, a: 1}
+    - _FarHeight: {r: 0.8, g: 3.2, b: 0, a: 0}
+    - _FieldColor: {r: 0.5, g: 0.72, b: 0.35999998, a: 1}
+    - _FieldStripeColor: {r: 0.43999997, g: 0.65, b: 0.30999997, a: 1}
+    - _GrassColor: {r: 0.29999998, g: 0.52, b: 0.24999997, a: 1}
+    - _GrassTipColor: {r: 0.39999998, g: 0.62, b: 0.29999998, a: 1}
+    - _LaneColor: {r: 0.95, g: 0.95, b: 0.9, a: 1}
+    - _LaneDash: {r: 2.5, g: 2.5, b: 0, a: 0}
+    - _NearColor: {r: 0.41999996, g: 0.62, b: 0.45, a: 1}
+    - _NearHeight: {r: 0.2, g: 1.6, b: 0, a: 0}
+    - _PoleBarSize: {r: 1.2, g: 0.1, b: 0, a: 0}
+    - _PoleColor: {r: 0.34999996, g: 0.29999998, b: 0.27999997, a: 1}
+    - _RoadColor: {r: 0.32999998, g: 0.32999998, b: 0.35999998, a: 1}
+    - _RoadRange: {r: 0.5, g: 1.6, b: 0, a: 0}
+    - _SkyHorizonColor: {r: 0.86, g: 0.93, b: 1, a: 1}
+    - _SkyTopColor: {r: 0.29999998, g: 0.54999995, b: 0.92, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
