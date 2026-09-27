@@ -32,7 +32,7 @@ namespace ZoukeiJam1.Initialization.OmikujiEngine
 
         [Tooltip("正転へ動かずに逆方向へ戻しても、ミス（回転速度が 0 になる）としないクランク角の量（rad）。0 なら少しでも逆へ動いたらミス。" +
                  "逆方向へは直前の死点まで（半回転ほど）しか戻れないため、それより大きくするとミスが起きなくなる")]
-        [SerializeField, Min(0f)] private float _reverseTolerance;
+        [SerializeField, Min(0f)] private float _reverseTolerance = 0.05f;
 
         /// <param name="blackBoard">IInputState と OmikujiEngineBoard の取得元</param>
         public override void Initialize(IBlackBoard blackBoard)
