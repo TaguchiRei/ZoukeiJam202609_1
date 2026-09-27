@@ -17,18 +17,18 @@ namespace ZoukeiJam1.Initialization.Result
         [Tooltip("各結果の、最低速度・最高速度での確率（%）、告白成功率の倍率、スコアの倍率。確率は合計が 100 でなくても、合計に対する割合で引く")]
         [SerializeField] private OmikujiEntry[] _omikujiEntries =
         {
-            new(OmikujiFortune.Daikichi, 2f, 40f, 1.5f, 1f),
-            new(OmikujiFortune.Chukichi, 8f, 30f, 1.2f, 0.6f),
-            new(OmikujiFortune.Shokichi, 20f, 15f, 1f, 0.3f),
-            new(OmikujiFortune.Kichi, 30f, 10f, 0.9f, 0.2f),
-            new(OmikujiFortune.Kyo, 40f, 5f, 0.5f, 0f),
+            new(OmikujiFortune.Daikichi, 5f, 95f, 1.5f, 1f),
+            new(OmikujiFortune.Chukichi, 10f, 4f, 1.2f, 0.6f),
+            new(OmikujiFortune.Shokichi, 25f, 1f, 1f, 0.3f),
+            new(OmikujiFortune.Kichi, 30f, 0f, 0.9f, 0.2f),
+            new(OmikujiFortune.Kyo, 30f, 0f, 0.5f, 0f),
         };
 
         [Tooltip("確率が「最低速度での確率」になるゴール時の速度（km/h）。これより遅くても確率は変わらない")]
-        [SerializeField, Min(0f)] private float _minSpeedKmh = 30f;
+        [SerializeField, Min(0f)] private float _minSpeedKmh = 40f;
 
         [Tooltip("確率が「最高速度での確率」になるゴール時の速度（km/h）。これより速くても確率は変わらない")]
-        [SerializeField, Min(0f)] private float _maxSpeedKmh = 120f;
+        [SerializeField, Min(0f)] private float _maxSpeedKmh = 160f;
 
         [Tooltip("最低速度での確率の合計（%）。100 から外れているときは設定を見直す")]
         [SerializeField, ShowOnly] private float _totalProbabilityAtMinSpeed;
@@ -37,8 +37,8 @@ namespace ZoukeiJam1.Initialization.Result
         [SerializeField, ShowOnly] private float _totalProbabilityAtMaxSpeed;
 
         [Header("告白")]
-        [Tooltip("ゴール時の残り時間 1 秒あたりの告白の基礎成功率（%）。基礎成功率におみくじの倍率を掛け、100% を上限とする")]
-        [SerializeField, Min(0f)] private float _confessionRatePerRemainingSecond = 1f;
+        [Tooltip("平均時速 1km/h あたりの告白の基礎成功率（%）。基礎成功率におみくじの倍率を掛け、100% を上限とする")]
+        [SerializeField, Min(0f)] private float _confessionRatePerAverageKmh = 0.5f;
 
         [Tooltip("告白が成功したときに、基礎スコアに掛けて加算する倍率")]
         [SerializeField, Min(0f)] private float _confessionSuccessScoreMultiplier = 1f;
@@ -63,7 +63,7 @@ namespace ZoukeiJam1.Initialization.Result
         public GoalResultCalculator CreateGoalResultCalculator()
         {
             return new GoalResultCalculator(
-                CreateOmikujiTable(), _baseScoreMultiplier, _confessionRatePerRemainingSecond,
+                CreateOmikujiTable(), _baseScoreMultiplier, _confessionRatePerAverageKmh,
                 _confessionSuccessScoreMultiplier, _bouquetThreshold, _ringThreshold);
         }
 

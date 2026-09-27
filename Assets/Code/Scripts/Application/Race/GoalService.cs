@@ -4,7 +4,7 @@ using ZoukeiJam1.BlackBoard.Race;
 namespace ZoukeiJam1.Application.Race
 {
     /// <summary>
-    /// 走行の進行段階がゴールになったら、ゴールタイム・制限時間・ゴール時の速度から結果を求めて記録する
+    /// 走行の進行段階がゴールになったら、ゴールタイム・ゴール時の速度から結果を求めて記録する
     /// </summary>
     public sealed class GoalService
     {
@@ -12,7 +12,7 @@ namespace ZoukeiJam1.Application.Race
         private readonly GoalResultCalculator _calculator;
         private readonly IGameResultRecorder _recorder;
 
-        /// <param name="raceState">ゴールの検知と、ゴールタイム・制限時間・ゴール時の速度の読み取り元</param>
+        /// <param name="raceState">ゴールの検知と、ゴールタイム・ゴール時の速度の読み取り元</param>
         /// <param name="calculator">ゴール時の結果の計算</param>
         /// <param name="recorder">結果の記録先</param>
         public GoalService(IRaceState raceState, GoalResultCalculator calculator, IGameResultRecorder recorder)
@@ -30,7 +30,7 @@ namespace ZoukeiJam1.Application.Race
             if (context.NewValue != RacePhase.Goal) return;
 
             var result = _calculator.Calculate(
-                _raceState.GoalDistance, _raceState.ElapsedTime, _raceState.TimeLimit, _raceState.Speed);
+                _raceState.GoalDistance, _raceState.ElapsedTime, _raceState.Speed);
             _recorder.Record(result);
         }
     }

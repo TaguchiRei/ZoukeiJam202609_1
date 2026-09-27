@@ -26,7 +26,7 @@ namespace ZoukeiJam1.BlackBoard.Race
         /// <summary>おみくじの結果による加算スコア（基礎スコア × OmikujiScoreMultiplier）</summary>
         public float OmikujiBonus { get; }
 
-        /// <summary>ゴール時の残り時間から求めた告白の基礎成功率（%）</summary>
+        /// <summary>平均時速から求めた告白の基礎成功率（%）</summary>
         public float ConfessionBaseRate { get; }
 
         /// <summary>おみくじの結果による、告白の基礎成功率に掛ける倍率</summary>
