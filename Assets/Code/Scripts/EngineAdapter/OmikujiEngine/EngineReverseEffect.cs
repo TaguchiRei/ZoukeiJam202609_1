@@ -9,16 +9,15 @@ using ZoukeiJam1.BlackBoard.OmikujiEngine;
 namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
 {
     /// <summary>
-    /// OmikujiEngine が逆回転して回転速度が 0 に戻ったとき、画面振動を発生させ、
-    /// 画面の縁の色の濃さを 1 にしてから 0 へ戻す。
-    /// 逆回転する直前の回転速度が _minSpeedToTrigger 未満のときは何もしない
+    /// OmikujiEngine がミスで止まったとき、画面振動を発生させ、
+    /// 画面の縁の色の濃さを 1 にしてから 0 へ戻す
     /// </summary>
     public sealed class EngineReverseEffect : InitializableMonoBehaviour
     {
-        [Tooltip("逆回転したときに発生させる画面振動")]
+        [Tooltip("ミスしたときに発生させる画面振動")]
         [SerializeField] private CinemachineImpulseSource _impulse;
 
-        [Tooltip("逆回転したときに色をつける画面の縁")]
+        [Tooltip("ミスしたときに色をつける画面の縁")]
         [SerializeField] private ScreenEdgeTint _edgeTint;
 
         [Tooltip("縁の色が消えるまでの時間（秒）")]
@@ -27,37 +26,22 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         [Tooltip("縁の色が消えるときのイージング")]
         [SerializeField] private Ease _fadeOutEase = Ease.OutCubic;
 
-        [Tooltip("逆回転する直前の回転速度（回転/秒）がこの値以上のときだけ演出を出す。0 なら常に出す")]
-        [SerializeField, Min(0f)] private float _minSpeedToTrigger = 0.3f;
-
-        private IOmikujiEngineState _engineState;
-        private IDisposable _isReversingChangedRegistration;
+        private IDisposable _isStalledChangedRegistration;
         private MotionHandle _fadeHandle;
 
-        /// <summary>前のフレームの終わりに読み取った回転速度（回転/秒）</summary>
-        private float _previousSpeed;
-
-        /// <param name="engineState">逆回転の検知と回転速度の読み取り元</param>
+        /// <param name="engineState">ミスの検知元</param>
         public void Initialize(IOmikujiEngineState engineState)
         {
-            _engineState = engineState;
-            _previousSpeed = engineState.RotationSpeed;
             if (_edgeTint != null) _edgeTint.SetIntensity(0f);
-            _isReversingChangedRegistration = engineState.RegisterEventOnIsReversingChanged(
-                new ActionEntry<StateContext<bool>>(false, OnIsReversingChanged));
+            _isStalledChangedRegistration = engineState.RegisterEventOnIsStalledChanged(
+                new ActionEntry<StateContext<bool>>(false, OnIsStalledChanged));
 
             base.Initialize();
         }
 
-        // 通知の時点で State の回転速度はすでに 0 になっているため、逆回転する直前の速度をフレームの終わりに記録しておく
-        private void LateUpdate()
+        private void OnIsStalledChanged(StateContext<bool> context)
         {
-            if (_engineState != null) _previousSpeed = _engineState.RotationSpeed;
-        }
-
-        private void OnIsReversingChanged(StateContext<bool> context)
-        {
-            if (!context.NewValue || _previousSpeed < _minSpeedToTrigger) return;
+            if (!context.NewValue) return;
 
             if (_impulse != null) _impulse.GenerateImpulse();
             PlayEdgeTint();
@@ -78,7 +62,7 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         private void OnDestroy()
         {
             _fadeHandle.TryCancel();
-            _isReversingChangedRegistration?.Dispose();
+            _isStalledChangedRegistration?.Dispose();
         }
     }
 }

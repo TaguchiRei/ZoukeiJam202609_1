@@ -15,6 +15,9 @@ namespace ZoukeiJam1.BlackBoard.OmikujiEngine
         /// <summary>本来の回転方向と逆に回っているか</summary>
         bool IsReversing { get; }
 
+        /// <summary>逆方向へ戻しすぎてミスとなり、回転速度が 0 で止まっているか。正転へ動き出すと false に戻る</summary>
+        bool IsStalled { get; }
+
         /// <summary>エンジンの回転速度（回転/秒）。変化の通知は行わない</summary>
         float RotationSpeed { get; }
 
@@ -32,5 +35,9 @@ namespace ZoukeiJam1.BlackBoard.OmikujiEngine
         /// <summary>IsReversing の変化時に実行する Action を登録する</summary>
         /// <returns>Dispose すると登録を解除できる</returns>
         IDisposable RegisterEventOnIsReversingChanged(ActionEntry<StateContext<bool>> changedAction);
+
+        /// <summary>IsStalled の変化時に実行する Action を登録する</summary>
+        /// <returns>Dispose すると登録を解除できる</returns>
+        IDisposable RegisterEventOnIsStalledChanged(ActionEntry<StateContext<bool>> changedAction);
     }
 }
