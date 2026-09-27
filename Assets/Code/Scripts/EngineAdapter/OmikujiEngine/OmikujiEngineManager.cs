@@ -120,17 +120,21 @@ namespace ZoukeiJam1.EngineAdapter.OmikujiEngine
         }
 
         /// <summary>
-        /// 死点へ近づく向きに動いていて、その死点から _deadCenterSnapDistance 以内に入った高さを死点の高さに揃える。
-        /// 離れる向きでは揃えない。揃えると、ゆっくり動かしたときに死点へ吸い戻されて離れられなくなる
+        /// 現在の行程で向かっている死点へ近づく向きに動いていて、その死点から _deadCenterSnapDistance 以内に入った高さを死点の高さに揃える。
+        /// 離れる向きや、直前に通過した死点へは揃えない。揃えると死点へ吸い戻され、逆回転としてミスになる。
+        /// 動いた向きは DeadCenterHeightTolerance 以下の差を無視して判定する。ピストンの高さはクランク角から求め直した値で誤差を含むため
         /// </summary>
         private float SnapToDeadCenter(float height, float currentHeight)
         {
-            bool movingUp = height > currentHeight;
-            bool movingDown = height < currentHeight;
+            bool movingUp = height - currentHeight > DeadCenterHeightTolerance;
+            bool movingDown = currentHeight - height > DeadCenterHeightTolerance;
+            PistonStroke stroke = Stroke;
 
-            if (movingUp && _geometry.TopDeadCenterHeight - height <= _deadCenterSnapDistance)
+            if (stroke == PistonStroke.Up && movingUp &&
+                _geometry.TopDeadCenterHeight - height <= _deadCenterSnapDistance)
                 return _geometry.TopDeadCenterHeight;
-            if (movingDown && height - _geometry.BottomDeadCenterHeight <= _deadCenterSnapDistance)
+            if (stroke == PistonStroke.Down && movingDown &&
+                height - _geometry.BottomDeadCenterHeight <= _deadCenterSnapDistance)
                 return _geometry.BottomDeadCenterHeight;
             return height;
         }

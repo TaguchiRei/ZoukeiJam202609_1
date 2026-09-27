@@ -2093,7 +2093,7 @@ MonoBehaviour:
   _pistonCollider: {fileID: 1770409340}
   _camera: {fileID: 330585545}
   _clockwise: 1
-  _deadCenterSnapDistance: 0.02
+  _deadCenterSnapDistance: 0.15
   _topDeadCenterImpulse: {fileID: 706291038}
   _topDeadCenterImpulseRearmDistance: 0.1
 --- !u!114 &706291038
