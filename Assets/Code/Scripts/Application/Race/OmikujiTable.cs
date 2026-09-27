@@ -28,12 +28,37 @@ namespace ZoukeiJam1.Application.Race
             _maxSpeed = maxSpeed;
         }
 
+        /// <summary>項目の数</summary>
+        public int Count => _entries.Length;
+
+        /// <summary>index 番目の項目</summary>
+        public OmikujiEntry this[int index] => _entries[index];
+
         /// <summary>指定した速度での項目の確率（%）。全項目の合計が 100 になるとは限らない</summary>
         /// <param name="speed">ゴール時の速度（km/h）</param>
         public float GetProbability(in OmikujiEntry entry, float speed)
         {
             float t = Mathf.InverseLerp(_minSpeed, _maxSpeed, speed);
             return Mathf.Max(0f, Mathf.Lerp(entry.ProbabilityAtMinSpeed, entry.ProbabilityAtMaxSpeed, t));
+        }
+
+        /// <summary>
+        /// 指定した速度で <see cref="Draw"/> が各項目を引く割合（0〜1、合計 1）を、項目の順に rates へ書き込む。
+        /// 全項目の確率が 0 のときは、すべて同じ割合にする
+        /// </summary>
+        /// <param name="speed">速度（km/h）</param>
+        /// <param name="rates">書き込み先。長さは <see cref="Count"/> 以上必要</param>
+        public void GetDrawRates(float speed, float[] rates)
+        {
+            float total = 0f;
+            for (int i = 0; i < _entries.Length; i++)
+            {
+                rates[i] = GetProbability(_entries[i], speed);
+                total += rates[i];
+            }
+
+            for (int i = 0; i < _entries.Length; i++)
+                rates[i] = total > 0f ? rates[i] / total : 1f / _entries.Length;
         }
 
         /// <summary>

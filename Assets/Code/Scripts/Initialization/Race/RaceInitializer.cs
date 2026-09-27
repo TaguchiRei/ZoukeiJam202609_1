@@ -17,7 +17,7 @@ namespace ZoukeiJam1.Initialization.Race
     /// <summary>
     /// BlackBoard から OmikujiEngine の State と RaceBoard を取り出して RaceService と GoalService を生成し、
     /// RaceTicker から毎フレーム RaceService を更新させ、開始演出の終了で走行を始めるようにつなぐ。
-    /// HUD・ゲームオーバーの表示・ゴールの演出には RaceService が登録した State を渡し、
+    /// HUD・おみくじの確率メーター・ゲームオーバーの表示・ゴールの演出には RaceService が登録した State を渡し、
     /// ゲームオーバーのボタンにタイトル・インゲームへの遷移を、ゴールの演出の終了にリザルトへの遷移をつなぐ
     /// </summary>
     [InitializeOrder(InitializeOrderConst.Default)]
@@ -29,6 +29,7 @@ namespace ZoukeiJam1.Initialization.Race
         [SerializeField] private RaceTicker _ticker;
         [SerializeField] private StartCountdown _startCountdown;
         [SerializeField] private RaceHud _hud;
+        [SerializeField] private OmikujiProbabilityMeter _probabilityMeter;
         [SerializeField] private GameOverView _gameOverView;
         [SerializeField] private GoalPresenter _goalPresenter;
 
@@ -67,6 +68,7 @@ namespace ZoukeiJam1.Initialization.Race
                 _goalService = new GoalService(
                     raceState, _resultSettings.CreateGoalResultCalculator(), _resultRecorder);
                 _hud.Initialize(raceState);
+                InitializeProbabilityMeter(raceState);
                 _gameOverView.Initialize(raceState, _sceneTransition.ToTitle, _sceneTransition.ToRace);
                 _goalPresenter.Initialize(raceState, _sceneTransition.ToResult);
             }
@@ -75,6 +77,18 @@ namespace ZoukeiJam1.Initialization.Race
             _startCountdown.Play(service.StartRunning);
 
             base.Initialize(blackBoard);
+        }
+
+        /// <summary>ResultSettings のおみくじの項目から、確率メーターに項目の結果の並びと、速度から各項目が引かれる割合を求める処理を渡す</summary>
+        private void InitializeProbabilityMeter(IRaceState raceState)
+        {
+            var omikujiTable = _resultSettings.CreateOmikujiTable();
+            var fortunes = new OmikujiFortune[omikujiTable.Count];
+            for (int i = 0; i < fortunes.Length; i++) fortunes[i] = omikujiTable[i].Fortune;
+
+            _probabilityMeter.Initialize(
+                raceState, fortunes, omikujiTable.GetDrawRates,
+                _resultSettings.MinSpeedKmh, _resultSettings.MaxSpeedKmh);
         }
     }
 }

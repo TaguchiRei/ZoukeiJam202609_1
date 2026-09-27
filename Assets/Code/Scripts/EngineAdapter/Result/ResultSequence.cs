@@ -115,7 +115,7 @@ namespace ZoukeiJam1.EngineAdapter.Result
             _omikujiBonusRow.Hide();
             _confessionBonusRow.Hide();
             _finalScoreRow.Hide();
-            _omikujiPaper.Prepare(ToDisplayName(result.Fortune), result.ConfessionRateMultiplier, _omikujiDropHeight);
+            _omikujiPaper.Prepare(result.Fortune.ToDisplayName(),result.ConfessionRateMultiplier, _omikujiDropHeight);
             _confessionItem.Prepare();
             _confessionMovie.Hide();
             _banner.Hide();
@@ -180,19 +180,6 @@ namespace ZoukeiJam1.EngineAdapter.Result
             _backToTitleButton.interactable = false;
             _retryButton.interactable = false;
             onClicked();
-        }
-
-        private static string ToDisplayName(OmikujiFortune fortune)
-        {
-            return fortune switch
-            {
-                OmikujiFortune.Daikichi => "大吉",
-                OmikujiFortune.Chukichi => "中吉",
-                OmikujiFortune.Shokichi => "小吉",
-                OmikujiFortune.Kichi => "吉",
-                OmikujiFortune.Kyo => "凶",
-                _ => fortune.ToString(),
-            };
         }
     }
 }
