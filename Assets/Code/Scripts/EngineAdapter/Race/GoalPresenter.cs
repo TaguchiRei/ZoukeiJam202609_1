@@ -41,8 +41,8 @@ namespace ZoukeiJam1.EngineAdapter.Race
         [Tooltip("マフラーから出てくるおみくじ。初期化時に非表示にする")]
         [SerializeField] private Transform _omikuji;
 
-        [Tooltip("おみくじが飛んでいく先の、マフラーの出口からの相対位置（ユニット）")]
-        [SerializeField] private Vector3 _popOffset = new(-1.5f, 3f, 0f);
+        [Tooltip("おみくじが飛んで止まる位置。ゴール時のカメラと画面演出の中心もこの位置に合わせる")]
+        [SerializeField] private Transform _restPoint;
 
         [Tooltip("おみくじが飛び出してから止まるまでの時間（秒）")]
         [SerializeField, Min(0.01f)] private float _popDuration = 0.8f;
@@ -100,13 +100,14 @@ namespace ZoukeiJam1.EngineAdapter.Race
             await UniTask.Delay(TimeSpan.FromSeconds(_popDelaySeconds), cancellationToken: token);
 
             Vector3 start = _mufflerExit.position;
+            Vector3 end = _restPoint.position;
 
             _omikuji.position = start;
             _omikuji.localScale = _omikujiScale * _startScale;
             _omikuji.gameObject.SetActive(true);
 
             await UniTask.WhenAll(
-                LMotion.Create(start, start + _popOffset, _popDuration)
+                LMotion.Create(start, end, _popDuration)
                     .WithEase(Ease.OutBack)
                     .BindToPosition(_omikuji)
                     .ToUniTask(token),

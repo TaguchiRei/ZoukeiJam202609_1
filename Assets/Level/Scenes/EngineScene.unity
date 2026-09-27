@@ -534,7 +534,7 @@ MonoBehaviour:
   _popDelaySeconds: 0.4
   _mufflerExit: {fileID: 1503632697}
   _omikuji: {fileID: 664037645}
-  _popOffset: {x: -1.5, y: 3, z: 0}
+  _restPoint: {fileID: 846461627}
   _popDuration: 0.8
   _spinDegrees: 540
   _startScale: 0.2
@@ -1177,7 +1177,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: ZoukeiJam1.EngineAdapter.Runtime::ZoukeiJam1.EngineAdapter.Race.GoalScreenEffect
   _image: {fileID: 1084835209}
   _camera: {fileID: 330585545}
-  _focusTarget: {fileID: 1503632697}
+  _focusTarget: {fileID: 846461627}
   _flashSeconds: 0.35
   _lineInSeconds: 0.25
   _lineSustainIntensity: 0.8
@@ -2766,6 +2766,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &846461626
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 846461627}
+  m_Layer: 0
+  m_Name: OmikujiRestPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &846461627
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 846461626}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.1666665, y: 2.4333334, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 955748775}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &882206331
 GameObject:
   m_ObjectHideFlags: 0
@@ -2937,6 +2968,7 @@ GameObject:
   - component: {fileID: 905078730}
   - component: {fileID: 905078728}
   - component: {fileID: 905078729}
+  - component: {fileID: 905078731}
   m_Layer: 0
   m_Name: GoalFocusCamera
   m_TagString: Untagged
@@ -2964,7 +2996,7 @@ MonoBehaviour:
   m_StreamingVersion: 0
   m_LegacyPriority: 0
   Target:
-    TrackingTarget: {fileID: 0}
+    TrackingTarget: {fileID: 846461627}
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
@@ -3026,6 +3058,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &905078731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 905078727}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b617507da6d07e749b7efdb34e1173e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineFollow
+  TrackerSettings:
+    BindingMode: 4
+    PositionDamping: {x: 0, y: 0, z: 0}
+    AngularDampingMode: 0
+    RotationDamping: {x: 1, y: 1, z: 1}
+    QuaternionDamping: 1
+  FollowOffset: {x: 0, y: 0, z: -10}
 --- !u!1 &933934073
 GameObject:
   m_ObjectHideFlags: 0
@@ -3157,6 +3208,7 @@ Transform:
   - {fileID: 2021446510}
   - {fileID: 2100229512}
   - {fileID: 1503632697}
+  - {fileID: 846461627}
   - {fileID: 664037645}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4402,7 +4454,6 @@ MonoBehaviour:
   _reverseEffect: {fileID: 1266144252}
   _speedSmoothingTime: 0.3
   _reverseTolerance: 0.05
-  _reverseStallDelay: 0.15
 --- !u!4 &1741629148
 Transform:
   m_ObjectHideFlags: 0
