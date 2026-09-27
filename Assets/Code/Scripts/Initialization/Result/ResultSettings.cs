@@ -28,7 +28,7 @@ namespace ZoukeiJam1.Initialization.Result
         [SerializeField, Min(0f)] private float _minSpeedKmh = 40f;
 
         [Tooltip("確率が「最高速度での確率」になるゴール時の速度（km/h）。これより速くても確率は変わらない")]
-        [SerializeField, Min(0f)] private float _maxSpeedKmh = 160f;
+        [SerializeField, Min(0f)] private float _maxSpeedKmh = 200f;
 
         [Tooltip("最低速度での確率の合計（%）。100 から外れているときは設定を見直す")]
         [SerializeField, ShowOnly] private float _totalProbabilityAtMinSpeed;

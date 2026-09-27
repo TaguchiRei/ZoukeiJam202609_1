@@ -5317,7 +5317,7 @@ MonoBehaviour:
   _meterImage: {fileID: 2030151301}
   _speedText: {fileID: 199479733}
   _probabilityText: {fileID: 109018738}
-  _maxScaleSpeedKmh: 160
+  _maxScaleSpeedKmh: 200
   _smoothTime: 0.1
   _speedFormat: '{0}<size=45%> km/h</size>'
   _probabilityFormat: "{0}\_<b>{1}</b>%"

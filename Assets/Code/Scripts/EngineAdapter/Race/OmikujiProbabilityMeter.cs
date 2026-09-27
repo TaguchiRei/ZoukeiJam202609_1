@@ -50,7 +50,7 @@ namespace ZoukeiJam1.EngineAdapter.Race
         [SerializeField] private TMP_Text _probabilityText;
 
         [Tooltip("アーチの右端に当たる速度（km/h）")]
-        [SerializeField, Min(1f)] private float _maxScaleSpeedKmh = 160f;
+        [SerializeField, Min(1f)] private float _maxScaleSpeedKmh = 200f;
 
         [Tooltip("表示する速度が実際の速度に追いつくまでのおおよその時間（秒）。0 なら遅らせない")]
         [SerializeField, Min(0f)] private float _smoothTime = 0.1f;

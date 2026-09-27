@@ -40,7 +40,7 @@ MonoBehaviour:
     _confessionRateMultiplier: 0.5
     _scoreMultiplier: 0
   _minSpeedKmh: 40
-  _maxSpeedKmh: 160
+  _maxSpeedKmh: 200
   _totalProbabilityAtMinSpeed: 100
   _totalProbabilityAtMaxSpeed: 100
   _confessionRatePerAverageKmh: 0.5
