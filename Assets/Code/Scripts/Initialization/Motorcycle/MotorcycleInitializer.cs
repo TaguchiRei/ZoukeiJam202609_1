@@ -5,15 +5,17 @@ using UsefulToolkit.BlackBoard.Logger;
 using UsefulToolkit.Initialization;
 using UsefulToolkit.Utility;
 using ZoukeiJam1.BlackBoard.Race;
+using ZoukeiJam1.EngineAdapter.Background;
 using ZoukeiJam1.EngineAdapter.Motorcycle;
 
 namespace ZoukeiJam1.Initialization.Motorcycle
 {
-    /// <summary>BlackBoard から走行の State を取り出し、MotorcycleManager に渡して動作を開始させる</summary>
+    /// <summary>BlackBoard から走行の State を取り出し、MotorcycleManager と ScrollingBackground に渡して動作を開始させる</summary>
     [InitializeOrder(InitializeOrderConst.DefaultLate)]
     public sealed class MotorcycleInitializer : InitializerBase
     {
         [SerializeField] private MotorcycleManager _motorcycleManager;
+        [SerializeField] private ScrollingBackground _scrollingBackground;
 
         /// <param name="blackBoard">IRaceState の取得元</param>
         public override void Initialize(IBlackBoard blackBoard)
@@ -26,6 +28,7 @@ namespace ZoukeiJam1.Initialization.Motorcycle
             }
 
             _motorcycleManager.Initialize(raceState);
+            _scrollingBackground.Initialize(raceState);
             base.Initialize(blackBoard);
         }
     }

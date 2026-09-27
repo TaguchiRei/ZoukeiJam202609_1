@@ -6,7 +6,8 @@ namespace ZoukeiJam1.EngineAdapter.Motorcycle
 {
     /// <summary>
     /// 走行の State の速度から、タイヤの回転と車体の上下振動を計算して Transform に反映する。
-    /// バイク自体はその場から動かさない。速度の単位はユニット/秒
+    /// バイク自体はその場から動かさない。速度の単位はユニット/秒。
+    /// 開始演出の間（RacePhase.Starting）はタイヤを回さず、車体の振動だけを行う
     /// </summary>
     public sealed class MotorcycleManager : InitializableMonoBehaviour
     {
@@ -92,7 +93,7 @@ namespace ZoukeiJam1.EngineAdapter.Motorcycle
             SetSpeed(_raceState.Speed);
             float distance = Speed * Time.deltaTime;
 
-            RotateWheels(distance);
+            if (_raceState.Phase != RacePhase.Starting) RotateWheels(distance);
             float offset = SmallVibrationOffset(distance) + BumpOffset(distance);
             _body.localPosition = _bodyBasePosition + Vector3.up * offset;
         }
