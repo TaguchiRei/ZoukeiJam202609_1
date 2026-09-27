@@ -2,6 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using LitMotion;
 using LitMotion.Extensions;
+using Unity.Cinemachine;
 using UnityEngine;
 using UsefulToolkit.BlackBoard.BlackBoard;
 using ZoukeiJam1.BlackBoard.Race;
@@ -10,10 +11,30 @@ using ZoukeiJam1.EngineAdapter.Fade;
 namespace ZoukeiJam1.EngineAdapter.Race
 {
     /// <summary>
-    /// 走行の進行段階がゴールになったら、おみくじをマフラーから回転させながら飛び出させ、少し待ってから暗転し、終了を通知する
+    /// 走行の進行段階がゴールになったら、HUD をフェードアウトさせ、画面演出を再生し、画面を振動させながらマフラーを映すカメラへ切り替える。
+    /// 少し待ってからおみくじをマフラーから回転させながら飛び出させ、止まってから少し待って暗転し、終了を通知する
     /// </summary>
     public sealed class GoalPresenter : MonoBehaviour
     {
+        [Tooltip("ゴール時に切り替えるカメラ。初期化時に非アクティブにし、ゴールでアクティブにする。" +
+                 "走行中のカメラより Priority を高くしておく。切り替えにかかる時間は CinemachineBrain の Default Blend で設定する")]
+        [SerializeField] private CinemachineCamera _focusCamera;
+
+        [Tooltip("ゴール時に再生する画面演出（フラッシュ・集中線・画面の縁の光）")]
+        [SerializeField] private GoalScreenEffect _screenEffect;
+
+        [Tooltip("ゴール時に発生させる画面振動")]
+        [SerializeField] private CinemachineImpulseSource _impulse;
+
+        [Tooltip("ゴール時にフェードアウトさせる HUD")]
+        [SerializeField] private CanvasGroup _hud;
+
+        [Tooltip("HUD のフェードアウトにかける時間（秒）")]
+        [SerializeField, Min(0f)] private float _hudFadeSeconds = 0.3f;
+
+        [Tooltip("ゴールしてからおみくじが飛び出し始めるまでの時間（秒）")]
+        [SerializeField, Min(0f)] private float _popDelaySeconds = 0.4f;
+
         [Tooltip("おみくじが出てくるマフラーの出口")]
         [SerializeField] private Transform _mufflerExit;
 
@@ -51,6 +72,9 @@ namespace ZoukeiJam1.EngineAdapter.Race
             _onFinished = onFinished;
             _omikujiScale = _omikuji.localScale;
             _omikuji.gameObject.SetActive(false);
+            _focusCamera.gameObject.SetActive(false);
+            _screenEffect.Initialize();
+            _hud.alpha = 1f;
             _fader.SetAlpha(0f);
             _phaseChangedRegistration = raceState.RegisterEventOnPhaseChanged(
                 new ActionEntry<StateContext<RacePhase>>(false, OnPhaseChanged));
@@ -64,6 +88,17 @@ namespace ZoukeiJam1.EngineAdapter.Race
         private async UniTaskVoid PlayAsync()
         {
             var token = destroyCancellationToken;
+
+            _focusCamera.gameObject.SetActive(true);
+            _screenEffect.Play();
+            _impulse.GenerateImpulse();
+            LMotion.Create(_hud.alpha, 0f, _hudFadeSeconds)
+                .Bind(_hud, static (alpha, hud) => hud.alpha = alpha)
+                .ToUniTask(token)
+                .Forget();
+
+            await UniTask.Delay(TimeSpan.FromSeconds(_popDelaySeconds), cancellationToken: token);
+
             Vector3 start = _mufflerExit.position;
 
             _omikuji.position = start;

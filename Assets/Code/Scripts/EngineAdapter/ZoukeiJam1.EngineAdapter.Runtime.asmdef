@@ -12,7 +12,8 @@
         "Unity.TextMeshPro",
         "LitMotion",
         "LitMotion.Extensions",
-        "UniTask"
+        "UniTask",
+        "UsefulToolkit.Framework.Runtime"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
