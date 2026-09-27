@@ -14,7 +14,7 @@ namespace ZoukeiJam1.Initialization.OmikujiEngine
     /// <summary>
     /// BlackBoard から入力 State と OmikujiEngineBoard を取り出し、OmikujiEngineManager と KujibikeService を生成・初期化して、
     /// Manager の毎フレームのクランクの動きを Service へ渡すようにつなぐ。
-    /// LinkedOmikujiEngine があれば、Service が登録した State を渡して初期化する
+    /// LinkedOmikujiEngine・EngineReverseEffect があれば、Service が登録した State を渡して初期化する
     /// </summary>
     [InitializeOrder(InitializeOrderConst.DefaultEarly)]
     public sealed class OmikujiEngineInitializer : InitializerBase
@@ -23,6 +23,9 @@ namespace ZoukeiJam1.Initialization.OmikujiEngine
 
         [Tooltip("OmikujiEngineManager と同じ動きをさせるエンジン。空なら何もしない")]
         [SerializeField] private LinkedOmikujiEngine _linkedEngine;
+
+        [Tooltip("逆回転したときに画面振動とポストエフェクトを出す。空なら何もしない")]
+        [SerializeField] private EngineReverseEffect _reverseEffect;
 
         [Tooltip("エンジンの回転速度が、そのフレームの角速度へ近づく速さの時定数（秒）。大きいほどなめらかになり、0 ならそのフレームの角速度をそのまま使う")]
         [SerializeField, Min(0f)] private float _speedSmoothingTime = 0.3f;
@@ -50,10 +53,10 @@ namespace ZoukeiJam1.Initialization.OmikujiEngine
                 _engineManager.Stroke, _engineManager.CrankAngle, _speedSmoothingTime);
             _engineManager.SetCrankUpdatedHandler(service.UpdateEngine);
 
-            if (_linkedEngine != null &&
-                engineBoard.TryGetSceneState<IOmikujiEngineState>(out var engineState, out _))
+            if (engineBoard.TryGetSceneState<IOmikujiEngineState>(out var engineState, out _))
             {
-                _linkedEngine.Initialize(engineState);
+                if (_linkedEngine != null) _linkedEngine.Initialize(engineState);
+                if (_reverseEffect != null) _reverseEffect.Initialize(engineState);
             }
 
             base.Initialize(blackBoard);
