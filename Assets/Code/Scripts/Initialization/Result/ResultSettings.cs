@@ -49,11 +49,21 @@ namespace ZoukeiJam1.Initialization.Result
         [Tooltip("告白アイテムが指輪になる告白の成功率（%）")]
         [SerializeField, Range(0f, 100f)] private float _ringThreshold = 70f;
 
+        /// <summary>確率が「最低速度での確率」になるゴール時の速度（km/h）</summary>
+        public float MinSpeedKmh => _minSpeedKmh;
+
+        /// <summary>確率が「最高速度での確率」になるゴール時の速度（km/h）</summary>
+        public float MaxSpeedKmh => _maxSpeedKmh;
+
+        public OmikujiTable CreateOmikujiTable()
+        {
+            return new OmikujiTable(_omikujiEntries, _minSpeedKmh, _maxSpeedKmh);
+        }
+
         public GoalResultCalculator CreateGoalResultCalculator()
         {
-            var omikujiTable = new OmikujiTable(_omikujiEntries, _minSpeedKmh, _maxSpeedKmh);
             return new GoalResultCalculator(
-                omikujiTable, _baseScoreMultiplier, _confessionRatePerRemainingSecond,
+                CreateOmikujiTable(), _baseScoreMultiplier, _confessionRatePerRemainingSecond,
                 _confessionSuccessScoreMultiplier, _bouquetThreshold, _ringThreshold);
         }
 
